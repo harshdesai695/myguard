@@ -1,0 +1,11 @@
+import 'package:dartz/dartz.dart'; import 'package:dio/dio.dart'; import 'package:myguard_frontend/core/error/exceptions.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/material/data/datasources/material_remote_datasource.dart'; import 'package:myguard_frontend/features/material/domain/entities/material_entity.dart'; import 'package:myguard_frontend/features/material/domain/repositories/material_repository.dart';
+
+class MaterialRepositoryImpl implements MaterialRepository {
+  const MaterialRepositoryImpl({required this.remoteDatasource}); final MaterialRemoteDatasource remoteDatasource;
+  Failure _m(DioException e) { final er = e.error; if (er is NetworkException) return const NetworkFailure(); if (er is ServerException) return ServerFailure(er.message ?? 'Error'); return const UnknownFailure(); }
+  @override Future<Either<Failure, PaginatedResponseModel<GatepassEntity>>> getGatepasses({int page = 0, int size = 20}) async { try { return Right(await remoteDatasource.getGatepasses(page: page, size: size)); } on DioException catch (e) { return Left(_m(e)); } catch (e) { return Left(UnknownFailure(e.toString())); } }
+  @override Future<Either<Failure, GatepassEntity>> getGatepassById(String id) async { try { return Right(await remoteDatasource.getGatepassById(id)); } on DioException catch (e) { return Left(_m(e)); } catch (e) { return Left(UnknownFailure(e.toString())); } }
+  @override Future<Either<Failure, GatepassEntity>> createGatepass(Map<String, dynamic> data) async { try { return Right(await remoteDatasource.createGatepass(data)); } on DioException catch (e) { return Left(_m(e)); } catch (e) { return Left(UnknownFailure(e.toString())); } }
+  @override Future<Either<Failure, GatepassEntity>> approveGatepass(String id) async { try { return Right(await remoteDatasource.approveGatepass(id)); } on DioException catch (e) { return Left(_m(e)); } catch (e) { return Left(UnknownFailure(e.toString())); } }
+  @override Future<Either<Failure, GatepassEntity>> verifyGatepass(String id) async { try { return Right(await remoteDatasource.verifyGatepass(id)); } on DioException catch (e) { return Left(_m(e)); } catch (e) { return Left(UnknownFailure(e.toString())); } }
+}

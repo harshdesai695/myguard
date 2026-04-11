@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "101542873689",
+    "project_id": "myguard-da568",
+    "storage_bucket": "myguard-da568.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101542873689:android:819397948d751a5fa63f48",
+        "android_client_info": {
+          "package_name": "com.myguard.myguard_frontend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101542873689-93bqd1atuvm9fjsfus7cc0da49ktbijb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqtZXpb6RNLpBt9O5J7wJan1LOTfpfFsc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101542873689-93bqd1atuvm9fjsfus7cc0da49ktbijb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,1107 @@
+{
+  "info": {
+    "name": "MyGuard API Collection",
+    "description": "Complete API collection for MyGuard — Gated-community management platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}" }]
+  },
+  "item": [
+    {
+      "name": "01 — Auth & User Management",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "register"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"+919876543210\",\n  \"societyId\": \"soc_abc123\",\n  \"flatNumber\": \"A-101\",\n  \"flatId\": \"flat_001\",\n  \"role\": \"ROLE_RESIDENT\"\n}"
+            },
+            "description": "Register a new user. Creates Firestore user doc and sets role."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"uid\": \"firebase_uid_123\",\n    \"name\": \"Rahul Sharma\",\n    \"email\": \"rahul.sharma@example.com\",\n    \"phone\": \"+919876543210\",\n    \"role\": \"ROLE_RESIDENT\",\n    \"status\": \"ACTIVE\",\n    \"societyId\": \"soc_abc123\",\n    \"flatId\": \"flat_001\",\n    \"flatNumber\": \"A-101\",\n    \"createdAt\": \"2026-04-09T10:00:00Z\",\n    \"updatedAt\": \"2026-04-09T10:00:00Z\"\n  },\n  \"timestamp\": \"2026-04-09T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "profile"] },
+            "description": "Get the current authenticated user's profile."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"uid\": \"firebase_uid_123\",\n    \"name\": \"Rahul Sharma\",\n    \"email\": \"rahul.sharma@example.com\",\n    \"phone\": \"+919876543210\",\n    \"role\": \"ROLE_RESIDENT\",\n    \"status\": \"ACTIVE\",\n    \"societyId\": \"soc_abc123\",\n    \"flatId\": \"flat_001\",\n    \"flatNumber\": \"A-101\"\n  },\n  \"timestamp\": \"2026-04-09T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update My Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/profile", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "profile"] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul K Sharma\",\n  \"phone\": \"+919876543211\"\n}"
+            },
+            "description": "Update the current user's profile."
+          },
+          "response": []
+        },
+        {
+          "name": "List Users (Admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/users?page=0&size=20&role=ROLE_RESIDENT",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "auth", "users"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "20" },
+                { "key": "role", "value": "ROLE_RESIDENT" }
+              ]
+            },
+            "description": "List all users with pagination and optional role filter. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get User by UID (Admin)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/users/{{uid}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "users", "{{uid}}"] },
+            "description": "Get any user's profile by UID. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Role (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/users/{{uid}}/role", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "users", "{{uid}}", "role"] },
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"ROLE_GUARD\"\n}" },
+            "description": "Change a user's role. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Status (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/users/{{uid}}/status", "host": ["{{baseUrl}}"], "path": ["api", "v1", "auth", "users", "{{uid}}", "status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"DEACTIVATED\"\n}" },
+            "description": "Activate or deactivate a user. Admin only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 — Society & Flat Management",
+      "item": [
+        {
+          "name": "Create Society",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/societies", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Green Valley Residency\",\n  \"address\": \"Plot 45, Sector 12\",\n  \"city\": \"Bangalore\",\n  \"state\": \"Karnataka\",\n  \"pincode\": \"560100\",\n  \"totalBlocks\": 5,\n  \"totalFlats\": 200\n}" },
+            "description": "Create a new society. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Societies",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/societies?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List all societies with pagination."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Society",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}"] },
+            "description": "Get society details by ID."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Society",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Green Valley Residency Phase 2\",\n  \"totalFlats\": 250\n}" },
+            "description": "Update society details. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Add Flat",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}/flats", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}", "flats"] },
+            "body": { "mode": "raw", "raw": "{\n  \"block\": \"A\",\n  \"floor\": 1,\n  \"flatNumber\": \"A-101\",\n  \"type\": \"2BHK\"\n}" },
+            "description": "Add a flat to a society. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Flats",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}/flats?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}", "flats"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List flats in a society."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Flat",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}/flats/{{flatId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}", "flats", "{{flatId}}"] },
+            "description": "Get flat details."
+          },
+          "response": []
+        },
+        {
+          "name": "Update Flat",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}/flats/{{flatId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}", "flats", "{{flatId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"OCCUPIED\",\n  \"primaryResidentUid\": \"firebase_uid_123\"\n}" },
+            "description": "Update flat details. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Residents in Flat",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/societies/{{societyId}}/flats/{{flatId}}/residents", "host": ["{{baseUrl}}"], "path": ["api", "v1", "societies", "{{societyId}}", "flats", "{{flatId}}", "residents"] },
+            "description": "List residents in a flat. Admin and Guard only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 — Gate & Visitor Management",
+      "item": [
+        {
+          "name": "Create Pre-Approval",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/pre-approve", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "pre-approve"] },
+            "body": { "mode": "raw", "raw": "{\n  \"visitorName\": \"Amit Kumar\",\n  \"visitorPhone\": \"+919812345678\",\n  \"purpose\": \"Delivery\",\n  \"validHours\": 24\n}" },
+            "description": "Pre-approve an expected visitor. Resident only."
+          },
+          "response": []
+        },
+        {
+          "name": "List My Pre-Approvals",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/pre-approvals?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "pre-approvals"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List my pre-approvals."
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Pre-Approval",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/pre-approvals/{{preApprovalId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "pre-approvals", "{{preApprovalId}}"] },
+            "description": "Cancel a pre-approval."
+          },
+          "response": []
+        },
+        {
+          "name": "Log Visitor Entry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/entry", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "entry"] },
+            "body": { "mode": "raw", "raw": "{\n  \"visitorName\": \"Amit Kumar\",\n  \"visitorPhone\": \"+919812345678\",\n  \"photoUrl\": \"https://storage.example.com/photos/visitor1.jpg\",\n  \"purpose\": \"Delivery\",\n  \"flatId\": \"flat_001\",\n  \"vehicleNumber\": \"KA-01-AB-1234\"\n}" },
+            "description": "Log a visitor entry. Guard only."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Visitor Entry",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/entry/{{visitorId}}/approve", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "entry", "{{visitorId}}", "approve"] },
+            "description": "Approve a spot-entry visitor. Resident only."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Visitor Entry",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/entry/{{visitorId}}/reject", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "entry", "{{visitorId}}", "reject"] },
+            "description": "Reject a spot-entry visitor. Resident only."
+          },
+          "response": []
+        },
+        {
+          "name": "Log Visitor Exit",
+          "request": {
+            "method": "PATCH",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/entry/{{visitorId}}/exit", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "entry", "{{visitorId}}", "exit"] },
+            "description": "Log visitor exit. Guard only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Visitor Logs",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List visitor logs. Admin/Guard."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Visitor Detail",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/{{visitorId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "{{visitorId}}"] },
+            "description": "Get visitor entry detail."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Recurring Invite",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/recurring", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "recurring"] },
+            "body": { "mode": "raw", "raw": "{\n  \"visitorName\": \"Ram Singh\",\n  \"visitorPhone\": \"+919876500001\",\n  \"purpose\": \"Daily milk delivery\",\n  \"validFrom\": \"2026-04-01T00:00:00Z\",\n  \"validUntil\": \"2026-06-30T23:59:59Z\"\n}" },
+            "description": "Create recurring invite. Resident only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Recurring Invites",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/recurring?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "recurring"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List my recurring invites."
+          },
+          "response": []
+        },
+        {
+          "name": "Revoke Recurring Invite",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/recurring/{{inviteId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "recurring", "{{inviteId}}"] },
+            "description": "Revoke recurring invite."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Guest Invite",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/guest-invite", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "guest-invite"] },
+            "body": { "mode": "raw", "raw": "{\n  \"guestName\": \"Priya Patel\",\n  \"guestPhone\": \"+919876500002\",\n  \"purpose\": \"House party\",\n  \"validHours\": 12\n}" },
+            "description": "Generate guest invitation with QR/code."
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Invite Code",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/verify/{{inviteCode}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "verify", "{{inviteCode}}"] },
+            "description": "Verify a guest invite code. Guard only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Overstaying Visitors",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/overstay?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "overstay"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] },
+            "description": "List overstaying visitors."
+          },
+          "response": []
+        },
+        {
+          "name": "Log Group Visitor Entry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/visitors/group-entry", "host": ["{{baseUrl}}"], "path": ["api", "v1", "visitors", "group-entry"] },
+            "body": { "mode": "raw", "raw": "{\n  \"flatId\": \"flat_001\",\n  \"purpose\": \"Birthday party\",\n  \"visitors\": [\n    { \"visitorName\": \"Guest 1\", \"visitorPhone\": \"+919800000001\" },\n    { \"visitorName\": \"Guest 2\", \"visitorPhone\": \"+919800000002\" }\n  ]\n}" },
+            "description": "Log group visitor entry. Guard only."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 — Daily Help Management",
+      "item": [
+        {
+          "name": "Register Daily Help",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/daily-helps", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Lakshmi\",\n  \"phone\": \"+919876500010\",\n  \"type\": \"maid\",\n  \"schedule\": \"Mon-Sat 7:00-9:00\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Daily Helps",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Daily Help",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Daily Help",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"schedule\": \"Mon-Fri 7:00-9:00\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Daily Help",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Mark Attendance",
+          "request": { "method": "POST", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}/attendance", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}", "attendance"] } },
+          "response": []
+        },
+        {
+          "name": "Get Attendance History",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}/attendance?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}", "attendance"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Attendance Summary",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/daily-helps/{{dailyHelpId}}/attendance/summary?month=2026-04", "host": ["{{baseUrl}}"], "path": ["api", "v1", "daily-helps", "{{dailyHelpId}}", "attendance", "summary"], "query": [{ "key": "month", "value": "2026-04" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 — Guard Management & Patrolling",
+      "item": [
+        {
+          "name": "Create Checkpoint",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/guards/patrols/checkpoints", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "patrols", "checkpoints"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Main Gate\",\n  \"description\": \"Primary entry checkpoint\",\n  \"societyId\": \"soc_abc123\",\n  \"latitude\": 12.9716,\n  \"longitude\": 77.5946\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Checkpoints",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/guards/patrols/checkpoints?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "patrols", "checkpoints"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Log Patrol",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/guards/patrols", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "patrols"] },
+            "body": { "mode": "raw", "raw": "{\n  \"checkpointId\": \"chk_001\",\n  \"notes\": \"All clear\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Patrols",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/guards/patrols?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "patrols"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Patrol Report",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/guards/patrols/report?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "patrols", "report"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        },
+        {
+          "name": "Create Shift",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/guards/shifts", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "shifts"] },
+            "body": { "mode": "raw", "raw": "{\n  \"guardUid\": \"guard_uid_001\",\n  \"societyId\": \"soc_abc123\",\n  \"shiftName\": \"Morning\",\n  \"startTime\": \"06:00\",\n  \"endTime\": \"14:00\",\n  \"date\": \"2026-04-10\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Shifts",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/guards/shifts?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "shifts"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Send E-Intercom",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/guards/e-intercom/{{flatId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "guards", "e-intercom", "{{flatId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"message\": \"You have a visitor at the gate\"\n}" }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 — Community Communications",
+      "item": [
+        {
+          "name": "Post Notice",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/notices", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "notices"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Water Supply Disruption\",\n  \"body\": \"Water supply will be interrupted on April 12 from 10 AM to 2 PM for maintenance.\",\n  \"type\": \"maintenance\",\n  \"expiryDate\": \"2026-04-12T23:59:59Z\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Notices",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/notices?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "notices"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Notice",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/notices/{{noticeId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "notices", "{{noticeId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Notice",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/notices/{{noticeId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "notices", "{{noticeId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Updated: Water Supply Disruption\",\n  \"body\": \"Water supply will be interrupted on April 13 instead.\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Notice",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/communications/notices/{{noticeId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "notices", "{{noticeId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Create Poll",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/polls", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "polls"] },
+            "body": { "mode": "raw", "raw": "{\n  \"question\": \"Should we install EV charging stations?\",\n  \"options\": [\"Yes\", \"No\", \"Need more info\"],\n  \"startDate\": \"2026-04-10T00:00:00Z\",\n  \"endDate\": \"2026-04-17T23:59:59Z\",\n  \"isSecret\": false,\n  \"allowMultipleVotes\": false\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Polls",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/polls?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "polls"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Poll with Results",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/polls/{{pollId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "polls", "{{pollId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Cast Vote",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/polls/{{pollId}}/vote", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "polls", "{{pollId}}", "vote"] },
+            "body": { "mode": "raw", "raw": "{\n  \"selectedOption\": \"Yes\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Group",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/groups", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "groups"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Tower A Residents\",\n  \"description\": \"Communication group for Tower A\",\n  \"type\": \"tower\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Groups",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/groups?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "groups"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Send Group Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/groups/{{groupId}}/messages", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "groups", "{{groupId}}", "messages"] },
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Reminder: Society meeting tomorrow at 7 PM.\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Group Messages",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/groups/{{groupId}}/messages?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "groups", "{{groupId}}", "messages"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/communications/documents", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "documents"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Society Bylaws 2026\",\n  \"description\": \"Updated bylaws\",\n  \"fileUrl\": \"https://storage.example.com/docs/bylaws2026.pdf\",\n  \"type\": \"bylaws\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Documents",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/documents?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "documents"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Document",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/communications/documents/{{documentId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "communications", "documents", "{{documentId}}"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 — Amenity Booking",
+      "item": [
+        {
+          "name": "Create Amenity",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/amenities", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Swimming Pool\",\n  \"type\": \"pool\",\n  \"capacity\": 30,\n  \"pricing\": 200.0,\n  \"operatingHours\": \"06:00-20:00\",\n  \"coolDownMinutes\": 30,\n  \"societyId\": \"soc_abc123\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Amenities",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Amenity",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities/{{amenityId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "{{amenityId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Amenity",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/amenities/{{amenityId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "{{amenityId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"pricing\": 250.0,\n  \"capacity\": 35\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Available Slots",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities/{{amenityId}}/slots?date=2026-04-15", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "{{amenityId}}", "slots"], "query": [{ "key": "date", "value": "2026-04-15" }] } },
+          "response": []
+        },
+        {
+          "name": "Book Amenity",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings"] },
+            "body": { "mode": "raw", "raw": "{\n  \"amenityId\": \"amenity_001\",\n  \"slotDate\": \"2026-04-15\",\n  \"slotStartTime\": \"10:00\",\n  \"slotEndTime\": \"11:00\",\n  \"companions\": 2\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Bookings",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Booking",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings/{{bookingId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings", "{{bookingId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Cancel Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings/{{bookingId}}/cancel", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings", "{{bookingId}}", "cancel"] } },
+          "response": []
+        },
+        {
+          "name": "Check-In Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings/{{bookingId}}/check-in", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings", "{{bookingId}}", "check-in"] } },
+          "response": []
+        },
+        {
+          "name": "Check-Out Booking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings/{{bookingId}}/check-out", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings", "{{bookingId}}", "check-out"] } },
+          "response": []
+        },
+        {
+          "name": "List All Bookings (Admin)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/amenities/bookings/admin?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "amenities", "bookings", "admin"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 — Digital Helpdesk",
+      "item": [
+        {
+          "name": "Create Ticket",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Leaking pipe in bathroom\",\n  \"description\": \"There is a water leak from the pipe in the master bathroom.\",\n  \"category\": \"Plumbing\",\n  \"priority\": \"HIGH\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Tickets",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Ticket",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/{{ticketId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "{{ticketId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Ticket Status",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/{{ticketId}}/status", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "{{ticketId}}", "status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Assign Ticket",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/{{ticketId}}/assign", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "{{ticketId}}", "assign"] },
+            "body": { "mode": "raw", "raw": "{\n  \"assignedTo\": \"staff_uid_001\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Comment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/{{ticketId}}/comment", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "{{ticketId}}", "comment"] },
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Plumber has been dispatched. Expected arrival in 30 minutes.\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Rate Ticket",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/{{ticketId}}/rate", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "{{ticketId}}", "rate"] },
+            "body": { "mode": "raw", "raw": "{\n  \"rating\": 4,\n  \"comment\": \"Quick resolution, thank you!\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List All Tickets (Admin)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/tickets/admin?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "tickets", "admin"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "categories"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Plumbing\",\n  \"description\": \"Water and plumbing related issues\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Categories",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/categories", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "categories"] } },
+          "response": []
+        },
+        {
+          "name": "Helpdesk Report",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/helpdesk/reports?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "helpdesk", "reports"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 — Vehicle & Parking",
+      "item": [
+        {
+          "name": "Register Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/vehicles", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles"] },
+            "body": { "mode": "raw", "raw": "{\n  \"plateNumber\": \"KA-01-AB-1234\",\n  \"make\": \"Hyundai\",\n  \"model\": \"Creta\",\n  \"colour\": \"White\",\n  \"type\": \"car\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Vehicles",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/vehicles?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Vehicle",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/vehicles/{{vehicleId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "{{vehicleId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Vehicle",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/vehicles/{{vehicleId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "{{vehicleId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"colour\": \"Silver\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Vehicle",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/vehicles/{{vehicleId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "{{vehicleId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Lookup Vehicle by Plate",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/vehicles/lookup/KA-01-AB-1234", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "lookup", "KA-01-AB-1234"] } },
+          "response": []
+        },
+        {
+          "name": "Allocate Parking",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/vehicles/parking", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "parking"] },
+            "body": { "mode": "raw", "raw": "{\n  \"slotNumber\": \"B-12\",\n  \"zone\": \"Block B\",\n  \"type\": \"covered\",\n  \"vehicleId\": \"veh_001\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Parking Allocations",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/vehicles/parking?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "parking"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Log Visitor Vehicle",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/vehicles/visitor-log", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "visitor-log"] },
+            "body": { "mode": "raw", "raw": "{\n  \"plateNumber\": \"MH-04-XY-5678\",\n  \"visitorEntryId\": \"visitor_001\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Visitor Vehicle Logs",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/vehicles/visitor-log?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "vehicles", "visitor-log"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 — Material Gatepass",
+      "item": [
+        {
+          "name": "Request Gatepass",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses"] },
+            "body": { "mode": "raw", "raw": "{\n  \"type\": \"OUTWARD\",\n  \"description\": \"Old sofa set\",\n  \"items\": [\"3-seater sofa\", \"2 cushions\"],\n  \"vehicleNumber\": \"KA-01-CD-9876\",\n  \"expectedDate\": \"2026-04-12\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List My Gatepasses",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Gatepass",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses/{{gatepassId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses", "{{gatepassId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Approve Gatepass",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses/{{gatepassId}}/approve", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses", "{{gatepassId}}", "approve"] } },
+          "response": []
+        },
+        {
+          "name": "Verify Gatepass at Gate",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses/{{gatepassId}}/verify", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses", "{{gatepassId}}", "verify"] } },
+          "response": []
+        },
+        {
+          "name": "List All Gatepasses (Admin)",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/material-gatepasses/admin?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "material-gatepasses", "admin"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 — Emergency & Panic",
+      "item": [
+        {
+          "name": "Trigger Panic",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/emergency/panic", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "panic"] },
+            "body": { "mode": "raw", "raw": "{\n  \"flatId\": \"flat_001\",\n  \"location\": \"Block A, Floor 1\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Active Panics",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/emergency/panic?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "panic"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Resolve Panic",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/emergency/panic/{{panicId}}/resolve", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "panic", "{{panicId}}", "resolve"] } },
+          "response": []
+        },
+        {
+          "name": "Add Emergency Contact",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/emergency/contacts", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "contacts"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Bangalore Police\",\n  \"phone\": \"100\",\n  \"type\": \"police\",\n  \"address\": \"Bangalore City\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Emergency Contacts",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/emergency/contacts?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "contacts"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Update Emergency Contact",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/emergency/contacts/{{contactId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "contacts", "{{contactId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"112\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Emergency Contact",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/emergency/contacts/{{contactId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "emergency", "contacts", "{{contactId}}"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12 — Pet Directory",
+      "item": [
+        {
+          "name": "Register Pet",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/pets", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Bruno\",\n  \"breed\": \"Golden Retriever\",\n  \"type\": \"dog\",\n  \"age\": 3,\n  \"photoUrl\": \"https://storage.example.com/pets/bruno.jpg\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Pets",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/pets?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Pet",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/pets/{{petId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets", "{{petId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Pet",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/pets/{{petId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets", "{{petId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"age\": 4\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Pet",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/pets/{{petId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets", "{{petId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Add Vaccination",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/pets/{{petId}}/vaccinations", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets", "{{petId}}", "vaccinations"] },
+            "body": { "mode": "raw", "raw": "{\n  \"vaccineName\": \"Rabies\",\n  \"dateAdministered\": \"2026-03-15\",\n  \"nextDueDate\": \"2027-03-15\",\n  \"vetName\": \"Dr. Rao\",\n  \"certificateUrl\": \"https://storage.example.com/certs/rabies_bruno.pdf\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "List Vaccinations",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/pets/{{petId}}/vaccinations?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "pets", "{{petId}}", "vaccinations"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "13 — Marketplace",
+      "item": [
+        {
+          "name": "Create Listing",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings"] },
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Study Table\",\n  \"description\": \"Wooden study table in excellent condition\",\n  \"photos\": [\"https://storage.example.com/marketplace/table1.jpg\"],\n  \"category\": \"furniture\",\n  \"price\": 3500.0,\n  \"condition\": \"like-new\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Browse Listings",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings?page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings"], "query": [{ "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        },
+        {
+          "name": "Get Listing",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings/{{listingId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings", "{{listingId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Listing",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings/{{listingId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings", "{{listingId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"price\": 3000.0\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Listing",
+          "request": { "method": "DELETE", "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings/{{listingId}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings", "{{listingId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Express Interest",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings/{{listingId}}/interest", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings", "{{listingId}}", "interest"] },
+            "body": { "mode": "raw", "raw": "{\n  \"message\": \"Is this still available?\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Mark as Sold",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/api/v1/marketplace/listings/{{listingId}}/mark-sold", "host": ["{{baseUrl}}"], "path": ["api", "v1", "marketplace", "listings", "{{listingId}}", "mark-sold"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14 — Admin Dashboard",
+      "item": [
+        {
+          "name": "Dashboard Summary",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/summary?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "summary"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true,\n  \"message\": \"Success\",\n  \"data\": {\n    \"totalResidents\": 450,\n    \"totalGuards\": 12,\n    \"totalFlats\": 200,\n    \"occupiedFlats\": 185,\n    \"vacantFlats\": 15,\n    \"openTickets\": 23,\n    \"activeVisitors\": 8,\n    \"totalVehicles\": 320\n  },\n  \"timestamp\": \"2026-04-09T10:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Visitor Statistics",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/visitor-stats?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "visitor-stats"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        },
+        {
+          "name": "Helpdesk Stats",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/helpdesk-stats?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "helpdesk-stats"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        },
+        {
+          "name": "Amenity Stats",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/amenity-stats?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "amenity-stats"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        },
+        {
+          "name": "Guard Performance",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/guard-performance?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "guard-performance"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }] } },
+          "response": []
+        },
+        {
+          "name": "Move-in/Move-out Log",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/api/v1/dashboard/move-in-out?from=2026-04-01T00:00:00Z&to=2026-04-09T23:59:59Z&page=0&size=20", "host": ["{{baseUrl}}"], "path": ["api", "v1", "dashboard", "move-in-out"], "query": [{ "key": "from", "value": "2026-04-01T00:00:00Z" }, { "key": "to", "value": "2026-04-09T23:59:59Z" }, { "key": "page", "value": "0" }, { "key": "size", "value": "20" }] } },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

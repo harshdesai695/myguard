@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    com.myguard: WARN
+
+myguard:
+  firebase:
+    credentials-path: ${FIREBASE_CREDENTIALS_PATH}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

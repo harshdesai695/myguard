@@ -1,0 +1,14 @@
+import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/society/data/models/society_model.dart';
+
+abstract class SocietyRemoteDatasource { Future<PaginatedResponseModel<SocietyModel>> getSocieties({int page, int size}); Future<SocietyModel> getSocietyById(String id); Future<SocietyModel> createSociety(Map<String, dynamic> data); Future<SocietyModel> updateSociety(String id, Map<String, dynamic> data); Future<PaginatedResponseModel<FlatModel>> getFlats(String societyId, {int page, int size}); Future<FlatModel> createFlat(String societyId, Map<String, dynamic> data); Future<FlatModel> updateFlat(String societyId, String flatId, Map<String, dynamic> data); }
+
+class SocietyRemoteDatasourceImpl implements SocietyRemoteDatasource {
+  const SocietyRemoteDatasourceImpl({required this.dioClient}); final DioClient dioClient;
+  @override Future<PaginatedResponseModel<SocietyModel>> getSocieties({int page = 0, int size = 20}) async { final r = await dioClient.get<Map<String, dynamic>>('/societies', queryParameters: {'page': page, 'size': size}); return PaginatedResponseModel.fromJson(r.data!['data'] as Map<String, dynamic>, (j) => SocietyModel.fromJson(j! as Map<String, dynamic>)); }
+  @override Future<SocietyModel> getSocietyById(String id) async { final r = await dioClient.get<Map<String, dynamic>>('/societies/$id'); return SocietyModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+  @override Future<SocietyModel> createSociety(Map<String, dynamic> data) async { final r = await dioClient.post<Map<String, dynamic>>('/societies', data: data); return SocietyModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+  @override Future<SocietyModel> updateSociety(String id, Map<String, dynamic> data) async { final r = await dioClient.put<Map<String, dynamic>>('/societies/$id', data: data); return SocietyModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+  @override Future<PaginatedResponseModel<FlatModel>> getFlats(String societyId, {int page = 0, int size = 20}) async { final r = await dioClient.get<Map<String, dynamic>>('/societies/$societyId/flats', queryParameters: {'page': page, 'size': size}); return PaginatedResponseModel.fromJson(r.data!['data'] as Map<String, dynamic>, (j) => FlatModel.fromJson(j! as Map<String, dynamic>)); }
+  @override Future<FlatModel> createFlat(String societyId, Map<String, dynamic> data) async { final r = await dioClient.post<Map<String, dynamic>>('/societies/$societyId/flats', data: data); return FlatModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+  @override Future<FlatModel> updateFlat(String societyId, String flatId, Map<String, dynamic> data) async { final r = await dioClient.put<Map<String, dynamic>>('/societies/$societyId/flats/$flatId', data: data); return FlatModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+}
