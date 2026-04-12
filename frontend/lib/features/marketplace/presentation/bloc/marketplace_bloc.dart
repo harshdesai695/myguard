@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/marketplace/domain/entities/marketplace_entity.dart'; import 'package:myguard_frontend/features/marketplace/domain/usecases/get_listings_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/marketplace/domain/entities/marketplace_entity.dart';
+import 'package:myguard_frontend/features/marketplace/domain/usecases/get_listings_usecase.dart';
 
 sealed class MarketplaceEvent extends Equatable { const MarketplaceEvent(); @override List<Object?> get props => []; }
 class ListingsFetched extends MarketplaceEvent { const ListingsFetched({this.page = 0, this.category}); final int page; final String? category; @override List<Object?> get props => [page, category]; }

@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/material/domain/entities/material_entity.dart'; import 'package:myguard_frontend/features/material/domain/usecases/get_gatepasses_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/material/domain/entities/material_entity.dart';
+import 'package:myguard_frontend/features/material/domain/usecases/get_gatepasses_usecase.dart';
 
 sealed class MaterialState extends Equatable { const MaterialState(); @override List<Object?> get props => []; }
 class MaterialInitial extends MaterialState { const MaterialInitial(); }

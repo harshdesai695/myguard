@@ -1,3 +1,7 @@
-import 'package:dartz/dartz.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart'; import 'package:myguard_frontend/features/emergency/domain/repositories/emergency_repository.dart';
+import 'package:dartz/dartz.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart';
+import 'package:myguard_frontend/features/emergency/domain/repositories/emergency_repository.dart';
 
 class GetEmergencyContactsUseCase { const GetEmergencyContactsUseCase({required this.repository}); final EmergencyRepository repository; Future<Either<Failure, PaginatedResponseModel<EmergencyContactEntity>>> call({int page = 0, int size = 20, String? societyId}) => repository.getEmergencyContacts(page: page, size: size, societyId: societyId); }

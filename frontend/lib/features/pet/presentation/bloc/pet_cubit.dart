@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/pet/domain/entities/pet_entity.dart'; import 'package:myguard_frontend/features/pet/domain/usecases/get_pets_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/pet/domain/entities/pet_entity.dart';
+import 'package:myguard_frontend/features/pet/domain/usecases/get_pets_usecase.dart';
 
 sealed class PetState extends Equatable { const PetState(); @override List<Object?> get props => []; }
 class PetInitial extends PetState { const PetInitial(); }

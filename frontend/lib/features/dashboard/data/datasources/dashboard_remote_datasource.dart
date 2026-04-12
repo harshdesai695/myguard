@@ -1,4 +1,5 @@
-import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/features/dashboard/data/models/dashboard_model.dart';
+import 'package:myguard_frontend/core/network/dio_client.dart';
+import 'package:myguard_frontend/features/dashboard/data/models/dashboard_model.dart';
 
 abstract class DashboardRemoteDatasource { Future<DashboardSummaryModel> getDashboardSummary(String societyId); }
 

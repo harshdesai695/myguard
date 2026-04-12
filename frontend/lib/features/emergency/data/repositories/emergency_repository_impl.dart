@@ -1,4 +1,11 @@
-import 'package:dartz/dartz.dart'; import 'package:dio/dio.dart'; import 'package:myguard_frontend/core/error/exceptions.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/emergency/data/datasources/emergency_remote_datasource.dart'; import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart'; import 'package:myguard_frontend/features/emergency/domain/repositories/emergency_repository.dart';
+import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
+import 'package:myguard_frontend/core/error/exceptions.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/emergency/data/datasources/emergency_remote_datasource.dart';
+import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart';
+import 'package:myguard_frontend/features/emergency/domain/repositories/emergency_repository.dart';
 
 class EmergencyRepositoryImpl implements EmergencyRepository {
   const EmergencyRepositoryImpl({required this.remoteDatasource}); final EmergencyRemoteDatasource remoteDatasource;

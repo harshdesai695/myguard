@@ -1,0 +1,97 @@
+# ═══════════════════════════════════════
+# MyGuard — Root .gitignore
+# ═══════════════════════════════════════
+
+# ── IDE ──
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.settings/
+.classpath
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# ── Environment & Secrets ──
+.env
+.env.*
+*.env
+firebase-service-account.json
+google-services.json
+GoogleService-Info.plist
+
+# ── Logs ──
+*.log
+logs/
+
+# ═══════════════════════════════════════
+# Backend (Spring Boot / Java / Maven)
+# ═══════════════════════════════════════
+backend/target/
+backend/*.jar
+backend/*.war
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# ── Frontend (Flutter / Dart) ──
+# ═══════════════════════════════════════
+frontend/.dart_tool/
+frontend/.flutter-plugins
+frontend/.flutter-plugins-dependencies
+frontend/.packages
+frontend/build/
+frontend/.metadata
+frontend/pubspec.lock
+
+# Flutter Android
+frontend/android/.gradle/
+frontend/android/.kotlin/
+frontend/android/app/debug/
+frontend/android/app/profile/
+frontend/android/app/release/
+frontend/android/local.properties
+frontend/android/key.properties
+frontend/android/app/*.jks
+frontend/android/app/*.keystore
+
+# Flutter iOS
+frontend/ios/Pods/
+frontend/ios/.symlinks/
+frontend/ios/Flutter/Flutter.framework
+frontend/ios/Flutter/Flutter.podspec
+frontend/ios/Flutter/App.framework
+frontend/ios/Flutter/Generated.xcconfig
+frontend/ios/Flutter/flutter_export_environment.sh
+frontend/ios/Runner.xcworkspace/xcshareddata/
+frontend/ios/ServiceDefinitions.json
+
+# Flutter Web
+frontend/web/favicon.png
+
+# Flutter Windows/Linux/macOS
+frontend/windows/flutter/ephemeral/
+frontend/linux/flutter/ephemeral/
+frontend/macos/Flutter/ephemeral/
+frontend/macos/Pods/
+
+# Code generation
+frontend/**/*.g.dart
+frontend/**/*.freezed.dart
+
+# ── Figma (binary files tracked via LFS or excluded) ──
+# figma/**/*.fig
+
+# ── Misc ──
+*.bak
+*.tmp
+*.temp
+error.txt
+coverage/
+doc/api/

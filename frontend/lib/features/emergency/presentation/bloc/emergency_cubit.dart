@@ -1,4 +1,8 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart'; import 'package:myguard_frontend/features/emergency/domain/usecases/get_emergency_contacts_usecase.dart'; import 'package:myguard_frontend/features/emergency/domain/usecases/trigger_panic_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart';
+import 'package:myguard_frontend/features/emergency/domain/usecases/get_emergency_contacts_usecase.dart';
+import 'package:myguard_frontend/features/emergency/domain/usecases/trigger_panic_usecase.dart';
 
 sealed class EmergencyState extends Equatable { const EmergencyState(); @override List<Object?> get props => []; }
 class EmergencyInitial extends EmergencyState { const EmergencyInitial(); }

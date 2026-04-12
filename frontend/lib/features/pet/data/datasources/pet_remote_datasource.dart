@@ -1,4 +1,6 @@
-import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/pet/data/models/pet_model.dart';
+import 'package:myguard_frontend/core/network/dio_client.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/pet/data/models/pet_model.dart';
 
 abstract class PetRemoteDatasource { Future<PaginatedResponseModel<PetModel>> getPets({int page, int size, String? societyId}); Future<PetModel> getPetById(String id); Future<PetModel> registerPet(Map<String, dynamic> data); Future<PetModel> updatePet(String id, Map<String, dynamic> data); Future<void> deletePet(String id); Future<VaccinationModel> addVaccination(String petId, Map<String, dynamic> data); Future<List<VaccinationModel>> getVaccinations(String petId); }
 

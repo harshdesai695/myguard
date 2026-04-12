@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/dashboard/domain/entities/dashboard_entity.dart'; import 'package:myguard_frontend/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/dashboard/domain/entities/dashboard_entity.dart';
+import 'package:myguard_frontend/features/dashboard/domain/usecases/get_dashboard_summary_usecase.dart';
 
 sealed class DashboardState extends Equatable { const DashboardState(); @override List<Object?> get props => []; }
 class DashboardInitial extends DashboardState { const DashboardInitial(); }

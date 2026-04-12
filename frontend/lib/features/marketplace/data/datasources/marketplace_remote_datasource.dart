@@ -1,4 +1,6 @@
-import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/marketplace/data/models/marketplace_model.dart';
+import 'package:myguard_frontend/core/network/dio_client.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/marketplace/data/models/marketplace_model.dart';
 
 abstract class MarketplaceRemoteDatasource { Future<PaginatedResponseModel<ListingModel>> getListings({int page, int size, String? category, String? societyId}); Future<ListingModel> getListingById(String id); Future<ListingModel> createListing(Map<String, dynamic> data); Future<ListingModel> updateListing(String id, Map<String, dynamic> data); Future<void> deleteListing(String id); Future<ListingModel> markSold(String id); Future<void> expressInterest(String listingId, Map<String, dynamic> data); }
 

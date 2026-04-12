@@ -1,4 +1,7 @@
-import 'package:equatable/equatable.dart'; import 'package:flutter_bloc/flutter_bloc.dart'; import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart'; import 'package:myguard_frontend/features/society/domain/usecases/get_societies_usecase.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart';
+import 'package:myguard_frontend/features/society/domain/usecases/get_societies_usecase.dart';
 
 sealed class SocietyEvent extends Equatable { const SocietyEvent(); @override List<Object?> get props => []; }
 class SocietiesFetched extends SocietyEvent { const SocietiesFetched({this.page = 0}); final int page; @override List<Object> get props => [page]; }

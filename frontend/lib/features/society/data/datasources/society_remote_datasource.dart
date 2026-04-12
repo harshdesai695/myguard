@@ -1,4 +1,6 @@
-import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/society/data/models/society_model.dart';
+import 'package:myguard_frontend/core/network/dio_client.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/society/data/models/society_model.dart';
 
 abstract class SocietyRemoteDatasource { Future<PaginatedResponseModel<SocietyModel>> getSocieties({int page, int size}); Future<SocietyModel> getSocietyById(String id); Future<SocietyModel> createSociety(Map<String, dynamic> data); Future<SocietyModel> updateSociety(String id, Map<String, dynamic> data); Future<PaginatedResponseModel<FlatModel>> getFlats(String societyId, {int page, int size}); Future<FlatModel> createFlat(String societyId, Map<String, dynamic> data); Future<FlatModel> updateFlat(String societyId, String flatId, Map<String, dynamic> data); }
 

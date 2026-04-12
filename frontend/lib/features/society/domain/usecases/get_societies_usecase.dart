@@ -1,3 +1,7 @@
-import 'package:dartz/dartz.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart'; import 'package:myguard_frontend/features/society/domain/repositories/society_repository.dart';
+import 'package:dartz/dartz.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart';
+import 'package:myguard_frontend/features/society/domain/repositories/society_repository.dart';
 
 class GetSocietiesUseCase { const GetSocietiesUseCase({required this.repository}); final SocietyRepository repository; Future<Either<Failure, PaginatedResponseModel<SocietyEntity>>> call({int page = 0, int size = 20}) => repository.getSocieties(page: page, size: size); }

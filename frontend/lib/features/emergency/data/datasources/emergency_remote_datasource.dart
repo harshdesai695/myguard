@@ -1,4 +1,6 @@
-import 'package:myguard_frontend/core/network/dio_client.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/emergency/data/models/emergency_model.dart';
+import 'package:myguard_frontend/core/network/dio_client.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/emergency/data/models/emergency_model.dart';
 
 abstract class EmergencyRemoteDatasource { Future<PanicAlertModel> triggerPanic(Map<String, dynamic> data); Future<PaginatedResponseModel<PanicAlertModel>> getPanicAlerts({int page, int size, String? societyId}); Future<PanicAlertModel> resolvePanic(String id); Future<PaginatedResponseModel<EmergencyContactModel>> getContacts({int page, int size, String? societyId}); Future<EmergencyContactModel> createContact(Map<String, dynamic> data); Future<EmergencyContactModel> updateContact(String id, Map<String, dynamic> data); Future<void> deleteContact(String id); }
 

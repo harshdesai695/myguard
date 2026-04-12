@@ -1,4 +1,7 @@
-import 'package:dartz/dartz.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/pet/domain/entities/pet_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/pet/domain/entities/pet_entity.dart';
 
 abstract class PetRepository {
   Future<Either<Failure, PaginatedResponseModel<PetEntity>>> getPets({int page, int size, String? societyId});

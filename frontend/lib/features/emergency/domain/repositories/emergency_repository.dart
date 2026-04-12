@@ -1,4 +1,7 @@
-import 'package:dartz/dartz.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/emergency/domain/entities/emergency_entity.dart';
 
 abstract class EmergencyRepository {
   Future<Either<Failure, PanicAlertEntity>> triggerPanic(Map<String, dynamic> data);

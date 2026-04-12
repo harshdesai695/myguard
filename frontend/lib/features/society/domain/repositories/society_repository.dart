@@ -1,4 +1,7 @@
-import 'package:dartz/dartz.dart'; import 'package:myguard_frontend/core/error/failures.dart'; import 'package:myguard_frontend/core/network/paginated_response_model.dart'; import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
+import 'package:myguard_frontend/features/society/domain/entities/society_entity.dart';
 
 abstract class SocietyRepository {
   Future<Either<Failure, PaginatedResponseModel<SocietyEntity>>> getSocieties({int page, int size});
