@@ -95,3 +95,4 @@ frontend/**/*.freezed.dart
 error.txt
 coverage/
 doc/api/
+prompts/
