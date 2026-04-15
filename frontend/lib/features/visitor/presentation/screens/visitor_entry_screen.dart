@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/features/visitor/presentation/bloc/visitor_bloc.dart';
 import 'package:myguard_frontend/features/visitor/presentation/bloc/visitor_bloc_models.dart';
@@ -99,7 +100,12 @@ class _VisitorEntryScreenState extends State<VisitorEntryScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    final picker = await ImagePicker().pickImage(source: ImageSource.camera);
+                    if (picker != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo captured')));
+                    }
+                  },
                   icon: const Icon(Icons.camera_alt_outlined),
                   label: const Text('Capture Photo'),
                   style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 48)),

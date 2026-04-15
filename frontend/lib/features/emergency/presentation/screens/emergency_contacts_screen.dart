@@ -92,7 +92,7 @@ class _EmergencyContactsScreenState extends State<EmergencyContactsScreen> {
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.phone_rounded, color: AppColors.success),
-                              onPressed: () {},
+                              onPressed: () => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Calling ${contact.phone}...'))),
                             ),
                           ),
                         )),

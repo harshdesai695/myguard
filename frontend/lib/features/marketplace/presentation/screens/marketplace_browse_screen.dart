@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/marketplace/presentation/bloc/marketpl
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class MarketplaceBrowseScreen extends StatefulWidget {
   const MarketplaceBrowseScreen({super.key});
@@ -27,7 +28,7 @@ class _MarketplaceBrowseScreenState extends State<MarketplaceBrowseScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Marketplace')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.push('/resident/marketplace/create'),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Sell'),
         backgroundColor: AppColors.primary,
@@ -53,7 +54,7 @@ class _MarketplaceBrowseScreenState extends State<MarketplaceBrowseScreen> {
                   return Card(
                     clipBehavior: Clip.antiAlias,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () => context.push('/resident/marketplace/${listing.id}'),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

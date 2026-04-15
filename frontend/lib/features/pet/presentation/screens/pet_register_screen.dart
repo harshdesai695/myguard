@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
@@ -27,7 +28,7 @@ class _PetRegisterScreenState extends State<PetRegisterScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Register Pet')),
       body: SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Center(child: GestureDetector(onTap: () {}, child: CircleAvatar(radius: 48, backgroundColor: AppColors.surface, child: const Icon(Icons.add_a_photo_outlined, size: 32, color: AppColors.grey500)))),
+        Center(child: GestureDetector(onTap: () async { final picker = await ImagePicker().pickImage(source: ImageSource.gallery); if (picker != null) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo selected'))); } }, child: CircleAvatar(radius: 48, backgroundColor: AppColors.surface, child: const Icon(Icons.add_a_photo_outlined, size: 32, color: AppColors.grey500)))),
         const SizedBox(height: AppSpacing.lg),
         AppTextField(label: 'Name', controller: _nameC, hint: 'Pet name', validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null),
         const SizedBox(height: AppSpacing.md),

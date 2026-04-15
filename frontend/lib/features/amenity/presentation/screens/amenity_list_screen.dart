@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/amenity/presentation/bloc/amenity_bloc
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class AmenityListScreen extends StatefulWidget {
   const AmenityListScreen({super.key});
@@ -55,7 +56,7 @@ class _AmenityListScreenState extends State<AmenityListScreen> {
                   return Card(
                     clipBehavior: Clip.antiAlias,
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () => context.push('/resident/amenities/${amenity.id}'),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [

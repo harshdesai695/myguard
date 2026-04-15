@@ -29,7 +29,7 @@ class MarketplaceListingDetailScreen extends StatelessWidget {
         const SizedBox(height: AppSpacing.sm),
         Text('Listing description will be loaded from the API.', style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600)),
         const SizedBox(height: AppSpacing.lg),
-        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: const Text('Seller'), subtitle: const Text('Contact details'), trailing: IconButton(icon: const Icon(Icons.chat_outlined, color: AppColors.primary), onPressed: () {}))),
+        Card(child: ListTile(leading: const CircleAvatar(child: Icon(Icons.person)), title: const Text('Seller'), subtitle: const Text('Contact details'), trailing: IconButton(icon: const Icon(Icons.chat_outlined, color: AppColors.primary), onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Chat with seller - coming soon')))))),
       ])),
     );
   }

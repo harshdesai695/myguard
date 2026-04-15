@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
@@ -38,7 +39,7 @@ class _DailyHelpRegisterScreenState extends State<DailyHelpRegisterScreen> {
           onSelectionChanged: (v) => setState(() => _selectedType = v.first),
         ),
         const SizedBox(height: AppSpacing.md),
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.camera_alt_outlined), label: const Text('Upload Photo'), style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 48))),
+        OutlinedButton.icon(onPressed: () async { final picker = await ImagePicker().pickImage(source: ImageSource.camera); if (picker != null) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo captured'))); } }, icon: const Icon(Icons.camera_alt_outlined), label: const Text('Upload Photo'), style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 48))),
         const SizedBox(height: AppSpacing.xl),
         AppButton(label: 'Register', onPressed: () { if (_formKey.currentState?.validate() ?? false) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Daily help registered'))); context.pop(); } }),
       ])))),

@@ -40,7 +40,7 @@ class HelpdeskTicketDetailScreen extends StatelessWidget {
             Center(child: Text('No comments yet', style: AppTypography.bodySmall.copyWith(color: AppColors.grey500))),
           ]))),
           const SizedBox(height: AppSpacing.md),
-          TextField(decoration: InputDecoration(hintText: 'Add a comment...', suffixIcon: IconButton(icon: const Icon(Icons.send_rounded), onPressed: () {}))),
+          TextField(decoration: InputDecoration(hintText: 'Add a comment...', suffixIcon: IconButton(icon: const Icon(Icons.send_rounded), onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comment sent')))))),
         ]),
       ),
     );

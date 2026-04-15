@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/material/presentation/bloc/material_cu
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class MaterialGatepassScreen extends StatefulWidget {
   const MaterialGatepassScreen({super.key});
@@ -27,7 +28,7 @@ class _MaterialGatepassScreenState extends State<MaterialGatepassScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Material Gatepass')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.push('/resident/material-gatepass/create'),
         icon: const Icon(Icons.add_rounded),
         label: const Text('New Gatepass'),
         backgroundColor: AppColors.primary,

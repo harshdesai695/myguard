@@ -101,13 +101,13 @@ class ProfileScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     children: [
-                      _MenuTile(icon: Icons.edit_outlined, title: 'Edit Profile', onTap: () {}),
+                      _MenuTile(icon: Icons.edit_outlined, title: 'Edit Profile', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit profile - coming soon')))),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.lock_outline, title: 'Change Password', onTap: () {}),
+                      _MenuTile(icon: Icons.lock_outline, title: 'Change Password', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Change password - coming soon')))),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.notifications_outlined, title: 'Notifications', onTap: () {}),
+                      _MenuTile(icon: Icons.notifications_outlined, title: 'Notifications', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification settings - coming soon')))),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () {}),
+                      _MenuTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Help & support - coming soon')))),
                     ],
                   ),
                 ),

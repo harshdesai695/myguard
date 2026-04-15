@@ -24,7 +24,7 @@ class _GuardManagementScreenState extends State<GuardManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Guard Management')),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () {}, icon: const Icon(Icons.add_rounded), label: Text('Add Guard'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
+      floatingActionButton: FloatingActionButton.extended(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add guard form - coming soon'))), icon: const Icon(Icons.add_rounded), label: Text('Add Guard'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
       body: _loading ? const AppShimmerList() : RefreshIndicator(onRefresh: _load, child: ListView(children: [
         const SizedBox(height: 200),
         AppEmptyWidget(message: 'No data yet. Pull to refresh.', icon: Icons.security_outlined, actionLabel: 'Refresh', onAction: _load),

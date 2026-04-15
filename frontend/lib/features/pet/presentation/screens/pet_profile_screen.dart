@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
@@ -26,7 +27,7 @@ class PetProfileScreen extends StatelessWidget {
         ]))),
         const SizedBox(height: AppSpacing.md),
         Card(child: Padding(padding: const EdgeInsets.all(AppSpacing.md), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [Text('Vaccinations', style: AppTypography.titleMedium), const Spacer(), TextButton.icon(onPressed: () {}, icon: const Icon(Icons.add, size: 16), label: const Text('Add'))]),
+          Row(children: [Text('Vaccinations', style: AppTypography.titleMedium), const Spacer(), TextButton.icon(onPressed: () => context.push('/resident/pets/$petId/vaccination'), icon: const Icon(Icons.add, size: 16), label: const Text('Add'))]),
           const SizedBox(height: AppSpacing.sm),
           Center(child: Text('No vaccination records', style: AppTypography.bodySmall.copyWith(color: AppColors.grey500))),
         ]))),

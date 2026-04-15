@@ -12,7 +12,7 @@ class RecurringInviteScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Recurring Invites')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Create recurring invite - coming soon'))),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Create'),
         backgroundColor: AppColors.primary,

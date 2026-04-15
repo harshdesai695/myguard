@@ -67,7 +67,7 @@ class _HelpdeskTicketListScreenState extends State<HelpdeskTicketListScreen> {
                   return Card(
                     margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: InkWell(
-                      onTap: () {},
+                      onTap: () => context.push('/resident/helpdesk/${ticket.id}'),
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
                         padding: const EdgeInsets.all(AppSpacing.md),

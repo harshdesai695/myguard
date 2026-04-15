@@ -24,7 +24,7 @@ class _AmenityManagementScreenState extends State<AmenityManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Amenity Management')),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () {}, icon: const Icon(Icons.add_rounded), label: Text('Add Amenity'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
+      floatingActionButton: FloatingActionButton.extended(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add amenity form - coming soon'))), icon: const Icon(Icons.add_rounded), label: Text('Add Amenity'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
       body: _loading ? const AppShimmerList() : RefreshIndicator(onRefresh: _load, child: ListView(children: [
         const SizedBox(height: 200),
         AppEmptyWidget(message: 'No data yet. Pull to refresh.', icon: Icons.sports_tennis_outlined, actionLabel: 'Refresh', onAction: _load),

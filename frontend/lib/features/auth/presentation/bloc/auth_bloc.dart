@@ -1,7 +1,7 @@
-import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myguard_frontend/core/firebase/auth_service.dart';
 import 'package:myguard_frontend/core/storage/secure_storage_service.dart';
+import 'package:myguard_frontend/features/auth/domain/entities/user_entity.dart';
 import 'package:myguard_frontend/features/auth/domain/usecases/get_profile_usecase.dart';
 import 'package:myguard_frontend/features/auth/domain/usecases/login_usecase.dart';
 import 'package:myguard_frontend/features/auth/domain/usecases/register_usecase.dart';
@@ -46,16 +46,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
 
     final result = await _getProfileUseCase();
-    if (result.isLeft()) {
-      emit(const AuthUnauthenticated());
-    } else {
-      final user = (result as Right).value;
-      await _secureStorage.saveUserRole(user.role);
-      if (user.societyId != null) {
-        await _secureStorage.saveSocietyId(user.societyId!);
-      }
-      emit(AuthAuthenticated(user));
-    }
+    result.fold(
+      (failure) => emit(const AuthUnauthenticated()),
+      (UserEntity user) async {
+        await _secureStorage.saveUserRole(user.role);
+        if (user.societyId != null) {
+          await _secureStorage.saveSocietyId(user.societyId!);
+        }
+        emit(AuthAuthenticated(user));
+      },
+    );
   }
 
   Future<void> _onLoginRequested(
@@ -69,19 +69,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       password: event.password,
     );
 
-    if (result.isLeft()) {
-      result.fold(
-        (failure) => emit(AuthFailure(failure.message)),
-        (_) {},
-      );
-    } else {
-      final user = (result as Right).value;
-      await _secureStorage.saveUserRole(user.role);
-      if (user.societyId != null) {
-        await _secureStorage.saveSocietyId(user.societyId!);
-      }
-      emit(AuthAuthenticated(user));
-    }
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (UserEntity user) async {
+        await _secureStorage.saveUserRole(user.role);
+        if (user.societyId != null) {
+          await _secureStorage.saveSocietyId(user.societyId!);
+        }
+        emit(AuthAuthenticated(user));
+      },
+    );
   }
 
   Future<void> _onRegisterRequested(
@@ -101,19 +98,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       flatId: event.flatId,
     );
 
-    if (result.isLeft()) {
-      result.fold(
-        (failure) => emit(AuthFailure(failure.message)),
-        (_) {},
-      );
-    } else {
-      final user = (result as Right).value;
-      await _secureStorage.saveUserRole(user.role);
-      if (user.societyId != null) {
-        await _secureStorage.saveSocietyId(user.societyId!);
-      }
-      emit(AuthAuthenticated(user));
-    }
+    result.fold(
+      (failure) => emit(AuthFailure(failure.message)),
+      (UserEntity user) async {
+        await _secureStorage.saveUserRole(user.role);
+        if (user.societyId != null) {
+          await _secureStorage.saveSocietyId(user.societyId!);
+        }
+        emit(AuthAuthenticated(user));
+      },
+    );
   }
 
   Future<void> _onLogoutRequested(

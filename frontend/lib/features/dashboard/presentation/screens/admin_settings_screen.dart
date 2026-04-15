@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
@@ -19,26 +20,26 @@ class AdminSettingsScreen extends StatelessWidget {
           _SettingsSection(
             title: 'General',
             children: [
-              _SettingsTile(icon: Icons.notifications_outlined, title: 'Notifications', subtitle: 'Push notification preferences', onTap: () {}),
-              _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Appearance', subtitle: 'Theme, dark mode', onTap: () {}),
-              _SettingsTile(icon: Icons.language_outlined, title: 'Language', subtitle: 'English', onTap: () {}),
+              _SettingsTile(icon: Icons.notifications_outlined, title: 'Notifications', subtitle: 'Push notification preferences', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification preferences - coming soon')))),
+              _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Appearance', subtitle: 'Theme, dark mode', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Appearance settings - coming soon')))),
+              _SettingsTile(icon: Icons.language_outlined, title: 'Language', subtitle: 'English', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Language settings - coming soon')))),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           _SettingsSection(
             title: 'Society',
             children: [
-              _SettingsTile(icon: Icons.edit_outlined, title: 'Edit Society Info', subtitle: 'Name, address, logo', onTap: () {}),
-              _SettingsTile(icon: Icons.access_time_outlined, title: 'Gate Timing', subtitle: 'Set visitor allowed hours', onTap: () {}),
+              _SettingsTile(icon: Icons.edit_outlined, title: 'Edit Society Info', subtitle: 'Name, address, logo', onTap: () => context.push('/admin/society')),
+              _SettingsTile(icon: Icons.access_time_outlined, title: 'Gate Timing', subtitle: 'Set visitor allowed hours', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gate timing settings - coming soon')))),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           _SettingsSection(
             title: 'Account',
             children: [
-              _SettingsTile(icon: Icons.privacy_tip_outlined, title: 'Privacy Policy', onTap: () {}),
-              _SettingsTile(icon: Icons.description_outlined, title: 'Terms of Service', onTap: () {}),
-              _SettingsTile(icon: Icons.info_outlined, title: 'About', subtitle: 'Version 1.0.0', onTap: () {}),
+              _SettingsTile(icon: Icons.privacy_tip_outlined, title: 'Privacy Policy', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Privacy policy')))),
+              _SettingsTile(icon: Icons.description_outlined, title: 'Terms of Service', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Terms of service')))),
+              _SettingsTile(icon: Icons.info_outlined, title: 'About', subtitle: 'Version 1.0.0', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('MyGuard v1.0.0')))),
             ],
           ),
           const SizedBox(height: AppSpacing.lg),

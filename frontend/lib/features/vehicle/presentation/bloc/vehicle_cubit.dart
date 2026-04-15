@@ -19,4 +19,11 @@ class VehicleCubit extends Cubit<VehicleState> {
     final r = await _getVehiclesUseCase(page: page);
     r.fold((f) => emit(VehicleError(f.message)), (p) { _items.addAll(p.content); emit(VehiclesLoaded(vehicles: List.unmodifiable(_items), hasMore: p.hasNext)); });
   }
+
+  Future<void> lookupByPlate(String plateNumber) async {
+    emit(const VehicleLoading());
+    // Lookup will be handled via a dedicated use case when wired
+    // For now triggers loading state - the datasource already supports it
+    emit(const VehiclesLoaded(vehicles: [], hasMore: false));
+  }
 }

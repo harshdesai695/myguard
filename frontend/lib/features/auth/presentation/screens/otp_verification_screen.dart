@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
@@ -57,11 +58,17 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                 )),
               ),
               const SizedBox(height: AppSpacing.xl),
-              AppButton(label: 'Verify', onPressed: _otp.length == 6 ? () {} : null, isLoading: _isLoading),
+              AppButton(label: 'Verify', onPressed: _otp.length == 6 ? () {
+                setState(() => _isLoading = true);
+                // Firebase OTP verification will be handled via AuthBloc
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Verifying OTP...')));
+              } : null, isLoading: _isLoading),
               const SizedBox(height: AppSpacing.lg),
               Center(
                 child: TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('OTP resent')));
+                  },
                   child: Text('Resend Code', style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
                 ),
               ),

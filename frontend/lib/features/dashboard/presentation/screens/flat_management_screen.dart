@@ -24,7 +24,7 @@ class _FlatManagementScreenState extends State<FlatManagementScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Flat Management')),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () {}, icon: const Icon(Icons.add_rounded), label: Text('Add Flat'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
+      floatingActionButton: FloatingActionButton.extended(onPressed: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Add flat form - coming soon'))), icon: const Icon(Icons.add_rounded), label: Text('Add Flat'), backgroundColor: AppColors.primary, foregroundColor: AppColors.onPrimary),
       body: _loading ? const AppShimmerList() : RefreshIndicator(onRefresh: _load, child: ListView(children: [
         const SizedBox(height: 200),
         AppEmptyWidget(message: 'No data yet. Pull to refresh.', icon: Icons.door_front_door_outlined, actionLabel: 'Refresh', onAction: _load),

@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/vehicle/presentation/bloc/vehicle_cubi
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class VehicleListScreen extends StatefulWidget {
   const VehicleListScreen({super.key});
@@ -27,7 +28,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('My Vehicles')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.push('/resident/vehicles/register'),
         icon: const Icon(Icons.add_rounded),
         label: const Text('Add Vehicle'),
         backgroundColor: AppColors.primary,

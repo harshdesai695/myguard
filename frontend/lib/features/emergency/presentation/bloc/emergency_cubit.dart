@@ -8,6 +8,7 @@ sealed class EmergencyState extends Equatable { const EmergencyState(); @overrid
 class EmergencyInitial extends EmergencyState { const EmergencyInitial(); }
 class EmergencyLoading extends EmergencyState { const EmergencyLoading(); }
 class EmergencyContactsLoaded extends EmergencyState { const EmergencyContactsLoaded(this.contacts); final List<EmergencyContactEntity> contacts; @override List<Object> get props => [contacts]; }
+class ChildAlertsLoaded extends EmergencyState { const ChildAlertsLoaded(this.alerts); final List<ChildAlertEntity> alerts; @override List<Object> get props => [alerts]; }
 class PanicTriggered extends EmergencyState { const PanicTriggered(); }
 class EmergencyError extends EmergencyState { const EmergencyError(this.message); final String message; @override List<Object> get props => [message]; }
 
@@ -17,4 +18,5 @@ class EmergencyCubit extends Cubit<EmergencyState> {
 
   Future<void> triggerPanic(Map<String, dynamic> data) async { emit(const EmergencyLoading()); final r = await _triggerPanicUseCase(data); r.fold((f) => emit(EmergencyError(f.message)), (_) => emit(const PanicTriggered())); }
   Future<void> loadContacts({String? societyId}) async { emit(const EmergencyLoading()); final r = await _getEmergencyContactsUseCase(societyId: societyId); r.fold((f) => emit(EmergencyError(f.message)), (p) => emit(EmergencyContactsLoaded(p.content))); }
+  Future<void> loadChildAlerts() async { emit(const EmergencyLoading()); /* Will call child alerts use case when wired */ emit(const ChildAlertsLoaded([])); }
 }

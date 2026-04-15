@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
@@ -28,7 +29,7 @@ class _MarketplaceCreateListingScreenState extends State<MarketplaceCreateListin
     return Scaffold(
       appBar: AppBar(title: const Text('Create Listing')),
       body: SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.all(AppSpacing.lg), child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        OutlinedButton.icon(onPressed: () {}, icon: const Icon(Icons.add_photo_alternate_outlined), label: const Text('Add Photos'), style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 100))),
+        OutlinedButton.icon(onPressed: () async { final picker = await ImagePicker().pickMultiImage(); if (picker.isNotEmpty) { ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${picker.length} photo(s) selected'))); } }, icon: const Icon(Icons.add_photo_alternate_outlined), label: const Text('Add Photos'), style: OutlinedButton.styleFrom(minimumSize: const Size(double.infinity, 100))),
         const SizedBox(height: AppSpacing.md),
         AppTextField(label: 'Title', controller: _titleC, hint: 'What are you selling?', validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null),
         const SizedBox(height: AppSpacing.md),

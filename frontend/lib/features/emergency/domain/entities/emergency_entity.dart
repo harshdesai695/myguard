@@ -11,3 +11,9 @@ class EmergencyContactEntity extends Equatable {
   final String id; final String name; final String phone; final String type; final String? address; final String? societyId; final DateTime? createdAt;
   @override List<Object?> get props => [id, name, type];
 }
+
+class ChildAlertEntity extends Equatable {
+  const ChildAlertEntity({required this.id, required this.childName, this.flatId, this.residentUid, this.type, this.gateId, this.societyId, this.timestamp, this.createdAt});
+  final String id; final String childName; final String? flatId; final String? residentUid; final String? type; final String? gateId; final String? societyId; final DateTime? timestamp; final DateTime? createdAt;
+  @override List<Object?> get props => [id, childName, type];
+}

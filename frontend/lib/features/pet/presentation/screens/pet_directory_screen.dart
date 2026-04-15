@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/pet/presentation/bloc/pet_cubit.dart';
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class PetDirectoryScreen extends StatefulWidget {
   const PetDirectoryScreen({super.key});
@@ -27,7 +28,7 @@ class _PetDirectoryScreenState extends State<PetDirectoryScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Pet Directory')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.push('/resident/pets/register'),
         icon: const Icon(Icons.pets_rounded),
         label: const Text('Register Pet'),
         backgroundColor: AppColors.primary,

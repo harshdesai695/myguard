@@ -7,6 +7,7 @@ import 'package:myguard_frontend/features/dailyhelp/presentation/bloc/dailyhelp_
 import 'package:myguard_frontend/shared/widgets/app_empty_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
 import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:go_router/go_router.dart';
 
 class DailyHelpListScreen extends StatefulWidget {
   const DailyHelpListScreen({super.key});
@@ -27,7 +28,7 @@ class _DailyHelpListScreenState extends State<DailyHelpListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Daily Helps')),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: () => context.push('/resident/daily-help/register'),
         icon: const Icon(Icons.person_add_rounded),
         label: const Text('Add Help'),
         backgroundColor: AppColors.primary,

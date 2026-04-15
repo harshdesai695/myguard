@@ -34,7 +34,7 @@ class _VisitorDetailScreenState extends State<VisitorDetailScreen> {
         builder: (context, state) {
           if (state is VisitorLoading) return const AppLoader();
           if (state is VisitorError) {
-            return AppErrorWidget(message: state.message, onRetry: () {});
+            return AppErrorWidget(message: state.message, onRetry: () => context.read<VisitorBloc>().add(const VisitorsFetched()));
           }
           if (state is VisitorsLoaded) {
             final visitor = state.visitors.where((v) => v.id == widget.visitorId).firstOrNull;

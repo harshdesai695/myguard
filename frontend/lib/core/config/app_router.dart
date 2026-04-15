@@ -6,6 +6,7 @@ import 'package:myguard_frontend/features/amenity/presentation/screens/amenity_l
 import 'package:myguard_frontend/features/amenity/presentation/screens/amenity_detail_screen.dart';
 import 'package:myguard_frontend/features/amenity/presentation/screens/amenity_booking_screen.dart';
 import 'package:myguard_frontend/features/amenity/presentation/screens/my_bookings_screen.dart';
+import 'package:myguard_frontend/features/amenity/presentation/screens/booking_detail_screen.dart';
 import 'package:myguard_frontend/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:myguard_frontend/features/auth/presentation/bloc/auth_state.dart';
 import 'package:myguard_frontend/features/auth/presentation/screens/community_screen.dart';
@@ -26,6 +27,9 @@ import 'package:myguard_frontend/features/communication/presentation/screens/not
 import 'package:myguard_frontend/features/communication/presentation/screens/poll_list_screen.dart';
 import 'package:myguard_frontend/features/communication/presentation/screens/poll_vote_screen.dart';
 import 'package:myguard_frontend/features/communication/presentation/screens/poll_create_screen.dart';
+import 'package:myguard_frontend/features/communication/presentation/screens/community_group_list_screen.dart';
+import 'package:myguard_frontend/features/communication/presentation/screens/community_chat_screen.dart';
+import 'package:myguard_frontend/features/communication/presentation/screens/document_upload_screen.dart';
 import 'package:myguard_frontend/features/dailyhelp/presentation/bloc/dailyhelp_cubit.dart';
 import 'package:myguard_frontend/features/dailyhelp/presentation/screens/daily_help_list_screen.dart';
 import 'package:myguard_frontend/features/dailyhelp/presentation/screens/daily_help_detail_screen.dart';
@@ -57,6 +61,7 @@ import 'package:myguard_frontend/features/dashboard/presentation/screens/move_in
 import 'package:myguard_frontend/features/emergency/presentation/bloc/emergency_cubit.dart';
 import 'package:myguard_frontend/features/emergency/presentation/screens/emergency_contacts_screen.dart';
 import 'package:myguard_frontend/features/emergency/presentation/screens/panic_button_screen.dart';
+import 'package:myguard_frontend/features/emergency/presentation/screens/child_alerts_screen.dart';
 import 'package:myguard_frontend/features/guard/presentation/bloc/patrol_cubit.dart';
 import 'package:myguard_frontend/features/guard/presentation/screens/guard_home_screen.dart';
 import 'package:myguard_frontend/features/guard/presentation/screens/patrol_screen.dart';
@@ -71,17 +76,22 @@ import 'package:myguard_frontend/features/marketplace/presentation/bloc/marketpl
 import 'package:myguard_frontend/features/marketplace/presentation/screens/marketplace_browse_screen.dart';
 import 'package:myguard_frontend/features/marketplace/presentation/screens/marketplace_listing_detail_screen.dart';
 import 'package:myguard_frontend/features/marketplace/presentation/screens/marketplace_create_listing_screen.dart';
+import 'package:myguard_frontend/features/marketplace/presentation/screens/my_listings_screen.dart';
 import 'package:myguard_frontend/features/material/presentation/bloc/material_cubit.dart' as mat;
 import 'package:myguard_frontend/features/material/presentation/screens/material_gatepass_screen.dart';
 import 'package:myguard_frontend/features/material/presentation/screens/material_gatepass_create_screen.dart';
+import 'package:myguard_frontend/features/material/presentation/screens/material_gatepass_detail_screen.dart';
 import 'package:myguard_frontend/features/material/presentation/screens/material_verify_screen.dart';
 import 'package:myguard_frontend/features/pet/presentation/bloc/pet_cubit.dart';
 import 'package:myguard_frontend/features/pet/presentation/screens/pet_directory_screen.dart';
 import 'package:myguard_frontend/features/pet/presentation/screens/pet_register_screen.dart';
 import 'package:myguard_frontend/features/pet/presentation/screens/pet_profile_screen.dart';
+import 'package:myguard_frontend/features/pet/presentation/screens/vaccination_add_screen.dart';
 import 'package:myguard_frontend/features/vehicle/presentation/bloc/vehicle_cubit.dart';
 import 'package:myguard_frontend/features/vehicle/presentation/screens/vehicle_list_screen.dart';
 import 'package:myguard_frontend/features/vehicle/presentation/screens/vehicle_register_screen.dart';
+import 'package:myguard_frontend/features/vehicle/presentation/screens/vehicle_detail_screen.dart';
+import 'package:myguard_frontend/features/vehicle/presentation/screens/vehicle_lookup_screen.dart';
 import 'package:myguard_frontend/features/vehicle/presentation/screens/vehicle_log_screen.dart';
 import 'package:myguard_frontend/features/visitor/presentation/bloc/visitor_bloc.dart';
 import 'package:myguard_frontend/features/visitor/presentation/screens/visitor_history_screen.dart';
@@ -137,6 +147,7 @@ class AppRouter {
       GoRoute(path: '/resident/daily-help/:id', builder: (_, s) => DailyHelpDetailScreen(helpId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/amenities', builder: (_, __) => BlocProvider(create: (_) => sl<AmenityBloc>(), child: const AmenityListScreen())),
       GoRoute(path: '/resident/amenities/my-bookings', builder: (_, __) => const MyBookingsScreen()),
+      GoRoute(path: '/resident/amenities/booking/:id', builder: (_, s) => BlocProvider(create: (_) => sl<AmenityBloc>(), child: BookingDetailScreen(bookingId: s.pathParameters['id']!))),
       GoRoute(path: '/resident/amenities/:id', builder: (_, s) => AmenityDetailScreen(amenityId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/amenities/book/:id', builder: (_, s) => AmenityBookingScreen(amenityId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/helpdesk', builder: (_, __) => BlocProvider(create: (_) => sl<HelpdeskBloc>(), child: const HelpdeskTicketListScreen())),
@@ -149,16 +160,23 @@ class AppRouter {
       GoRoute(path: '/resident/documents', builder: (_, __) => const DocumentsScreen()),
       GoRoute(path: '/resident/vehicles', builder: (_, __) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: const VehicleListScreen())),
       GoRoute(path: '/resident/vehicles/register', builder: (_, __) => const VehicleRegisterScreen()),
+      GoRoute(path: '/resident/vehicles/:id', builder: (_, s) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: VehicleDetailScreen(vehicleId: s.pathParameters['id']!))),
       GoRoute(path: '/resident/material-gatepass', builder: (_, __) => BlocProvider(create: (_) => sl<mat.MaterialCubit>(), child: const MaterialGatepassScreen())),
       GoRoute(path: '/resident/material-gatepass/create', builder: (_, __) => const MaterialGatepassCreateScreen()),
+      GoRoute(path: '/resident/material-gatepass/:id', builder: (_, s) => BlocProvider(create: (_) => sl<mat.MaterialCubit>(), child: MaterialGatepassDetailScreen(gatepassId: s.pathParameters['id']!))),
       GoRoute(path: '/resident/marketplace', builder: (_, __) => BlocProvider(create: (_) => sl<MarketplaceBloc>(), child: const MarketplaceBrowseScreen())),
       GoRoute(path: '/resident/marketplace/create', builder: (_, __) => const MarketplaceCreateListingScreen()),
+      GoRoute(path: '/resident/marketplace/my-listings', builder: (_, __) => BlocProvider(create: (_) => sl<MarketplaceBloc>(), child: const MyListingsScreen())),
       GoRoute(path: '/resident/marketplace/:id', builder: (_, s) => MarketplaceListingDetailScreen(listingId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/pets', builder: (_, __) => BlocProvider(create: (_) => sl<PetCubit>(), child: const PetDirectoryScreen())),
       GoRoute(path: '/resident/pets/register', builder: (_, __) => const PetRegisterScreen()),
       GoRoute(path: '/resident/pets/:id', builder: (_, s) => PetProfileScreen(petId: s.pathParameters['id']!)),
+      GoRoute(path: '/resident/pets/:id/vaccination', builder: (_, s) => VaccinationAddScreen(petId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/emergency', builder: (_, __) => BlocProvider(create: (_) => sl<EmergencyCubit>(), child: const EmergencyContactsScreen())),
       GoRoute(path: '/resident/emergency/panic', builder: (_, __) => const PanicButtonScreen()),
+      GoRoute(path: '/resident/emergency/child-alerts', builder: (_, __) => BlocProvider(create: (_) => sl<EmergencyCubit>(), child: const ChildAlertsScreen())),
+      GoRoute(path: '/resident/groups', builder: (_, __) => const CommunityGroupListScreen()),
+      GoRoute(path: '/resident/groups/:id', builder: (_, s) => CommunityChatScreen(groupId: s.pathParameters['id']!)),
       ShellRoute(builder: (_, __, child) => _GuardShell(child: child), routes: [
         GoRoute(path: '/guard', builder: (_, __) => const GuardHomeScreen()),
         GoRoute(path: '/guard/gate', builder: (_, __) => BlocProvider(create: (_) => sl<VisitorBloc>(), child: const VisitorEntryScreen())),
@@ -173,6 +191,7 @@ class AppRouter {
       GoRoute(path: '/guard/patrol/scan', builder: (_, __) => const PatrolCheckpointScanScreen()),
       GoRoute(path: '/guard/e-intercom', builder: (_, __) => const EIntercomScreen()),
       GoRoute(path: '/guard/vehicle-log', builder: (_, __) => const VehicleLogScreen()),
+      GoRoute(path: '/guard/vehicle-lookup', builder: (_, __) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: const VehicleLookupScreen())),
       GoRoute(path: '/guard/material-verify', builder: (_, __) => const MaterialVerifyScreen()),
       ShellRoute(builder: (_, __, child) => _AdminShell(child: child), routes: [
         GoRoute(path: '/admin', builder: (_, __) => const AdminHomeScreen()),
@@ -201,6 +220,7 @@ class AppRouter {
       GoRoute(path: '/admin/material-gatepasses', builder: (_, __) => const MaterialGatepassManagementScreen()),
       GoRoute(path: '/admin/emergency-contacts', builder: (_, __) => const EmergencyContactManagementScreen()),
       GoRoute(path: '/admin/documents', builder: (_, __) => const DocumentManagementScreen()),
+      GoRoute(path: '/admin/documents/upload', builder: (_, __) => const DocumentUploadScreen()),
       GoRoute(path: '/admin/move-in-out', builder: (_, __) => const MoveInOutScreen()),
     ],
   );
