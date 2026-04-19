@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 
 /**
  * Firestore collection: /parking_slots/{id}
@@ -22,5 +21,5 @@ public class ParkingSlotEntity {
     private String type;
     private String allocatedVehicleId;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

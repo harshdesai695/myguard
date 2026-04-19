@@ -46,16 +46,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
 
     final result = await _getProfileUseCase();
-    result.fold(
-      (failure) => emit(const AuthUnauthenticated()),
-      (UserEntity user) async {
-        await _secureStorage.saveUserRole(user.role);
-        if (user.societyId != null) {
-          await _secureStorage.saveSocietyId(user.societyId!);
-        }
-        emit(AuthAuthenticated(user));
-      },
-    );
+    if (result.isLeft()) {
+      emit(const AuthUnauthenticated());
+      return;
+    }
+    final user = result.getOrElse(() => throw StateError('unreachable'));
+    await _secureStorage.saveUserRole(user.role);
+    if (user.societyId != null) {
+      await _secureStorage.saveSocietyId(user.societyId!);
+    }
+    emit(AuthAuthenticated(user));
   }
 
   Future<void> _onLoginRequested(
@@ -69,16 +69,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       password: event.password,
     );
 
-    result.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (UserEntity user) async {
-        await _secureStorage.saveUserRole(user.role);
-        if (user.societyId != null) {
-          await _secureStorage.saveSocietyId(user.societyId!);
-        }
-        emit(AuthAuthenticated(user));
-      },
-    );
+    if (result.isLeft()) {
+      result.fold((f) => emit(AuthFailure(f.message)), (_) {});
+      return;
+    }
+    final user = result.getOrElse(() => throw StateError('unreachable'));
+    await _secureStorage.saveUserRole(user.role);
+    if (user.societyId != null) {
+      await _secureStorage.saveSocietyId(user.societyId!);
+    }
+    emit(AuthAuthenticated(user));
   }
 
   Future<void> _onRegisterRequested(
@@ -98,16 +98,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       flatId: event.flatId,
     );
 
-    result.fold(
-      (failure) => emit(AuthFailure(failure.message)),
-      (UserEntity user) async {
-        await _secureStorage.saveUserRole(user.role);
-        if (user.societyId != null) {
-          await _secureStorage.saveSocietyId(user.societyId!);
-        }
-        emit(AuthAuthenticated(user));
-      },
-    );
+    if (result.isLeft()) {
+      result.fold((f) => emit(AuthFailure(f.message)), (_) {});
+      return;
+    }
+    final user = result.getOrElse(() => throw StateError('unreachable'));
+    await _secureStorage.saveUserRole(user.role);
+    if (user.societyId != null) {
+      await _secureStorage.saveSocietyId(user.societyId!);
+    }
+    emit(AuthAuthenticated(user));
   }
 
   Future<void> _onLogoutRequested(

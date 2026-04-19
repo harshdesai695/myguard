@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -24,5 +23,5 @@ public class GroupEntity {
     private List<String> memberUids;
     private String createdBy;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

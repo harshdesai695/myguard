@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /pre_approvals/{id}
  * Document ID: Auto-generated
@@ -25,7 +23,7 @@ public class PreApprovalEntity {
     private String societyId;
     private String inviteCode;
     private String status;
-    private Instant validFrom;
-    private Instant validUntil;
-    private Instant createdAt;
+    private Object validFrom;
+    private Object validUntil;
+    private Object createdAt;
 }

@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /pet_directory/{id}
  * Document ID: Auto-generated
@@ -26,5 +24,5 @@ public class PetEntity {
     private String flatId;
     private String vaccinationStatus;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

@@ -1,19 +1,8 @@
 package com.myguard.visitor.controller;
 
-import com.myguard.common.response.ApiResponse;
-import com.myguard.common.response.PaginatedResponse;
-import com.myguard.visitor.dto.request.CreateGuestInviteRequest;
-import com.myguard.visitor.dto.request.CreatePreApprovalRequest;
-import com.myguard.visitor.dto.request.CreateRecurringInviteRequest;
-import com.myguard.visitor.dto.request.GroupVisitorEntryRequest;
-import com.myguard.visitor.dto.request.LogVisitorEntryRequest;
-import com.myguard.visitor.dto.response.PreApprovalResponse;
-import com.myguard.visitor.dto.response.RecurringInviteResponse;
-import com.myguard.visitor.dto.response.VisitorResponse;
-import com.myguard.visitor.service.VisitorService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,8 +16,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.Instant;
-import java.util.List;
+import com.myguard.common.response.ApiResponse;
+import com.myguard.common.response.PaginatedResponse;
+import com.myguard.visitor.dto.request.CreateGuestInviteRequest;
+import com.myguard.visitor.dto.request.CreatePreApprovalRequest;
+import com.myguard.visitor.dto.request.CreateRecurringInviteRequest;
+import com.myguard.visitor.dto.request.GroupVisitorEntryRequest;
+import com.myguard.visitor.dto.request.LogVisitorEntryRequest;
+import com.myguard.visitor.dto.response.PreApprovalResponse;
+import com.myguard.visitor.dto.response.RecurringInviteResponse;
+import com.myguard.visitor.dto.response.VisitorResponse;
+import com.myguard.visitor.service.VisitorService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -92,7 +94,7 @@ public class VisitorController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'GUARD')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'GUARD', 'RESIDENT')")
     public ResponseEntity<ApiResponse<PaginatedResponse<VisitorResponse>>> listVisitors(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,

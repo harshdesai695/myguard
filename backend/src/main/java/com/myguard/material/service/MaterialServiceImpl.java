@@ -1,5 +1,12 @@
 package com.myguard.material.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.exception.ValidationException;
 import com.myguard.common.response.PaginatedResponse;
@@ -8,14 +15,9 @@ import com.myguard.material.dto.request.CreateGatepassRequest;
 import com.myguard.material.dto.response.GatepassResponse;
 import com.myguard.material.repository.MaterialRepository;
 import com.myguard.material.view.GatepassEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,12 +40,12 @@ public class MaterialServiceImpl implements MaterialService {
                 .description(request.getDescription())
                 .items(request.getItems())
                 .vehicleNumber(request.getVehicleNumber())
-                .expectedDate(request.getExpectedDate())
+                .expectedDate(request.getExpectedDate() != null ? request.getExpectedDate().toString() : null)
                 .requestedBy(uid)
                 .flatId(request.getFlatId())
                 .status(MaterialConstants.STATUS_PENDING)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         GatepassEntity saved = materialRepository.saveGatepass(entity);
@@ -106,7 +108,7 @@ public class MaterialServiceImpl implements MaterialService {
 
         entity.setStatus(MaterialConstants.STATUS_VERIFIED);
         entity.setVerifiedBy(uid);
-        entity.setVerifiedAt(Instant.now());
+        entity.setVerifiedAt(Instant.now().toString());
 
         GatepassEntity updated = materialRepository.updateGatepass(entity);
         log.info("[MATERIAL] Gatepass verified: {}", id);
@@ -134,11 +136,20 @@ public class MaterialServiceImpl implements MaterialService {
         return GatepassResponse.builder()
                 .id(entity.getId()).type(entity.getType())
                 .description(entity.getDescription()).items(entity.getItems())
-                .vehicleNumber(entity.getVehicleNumber()).expectedDate(entity.getExpectedDate())
+                .vehicleNumber(entity.getVehicleNumber())
+                .expectedDate(entity.getExpectedDate() != null ? parseInstant(entity.getExpectedDate()) : null)
                 .requestedBy(entity.getRequestedBy()).flatId(entity.getFlatId())
                 .status(entity.getStatus()).approvedBy(entity.getApprovedBy())
-                .verifiedBy(entity.getVerifiedBy()).verifiedAt(entity.getVerifiedAt())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .verifiedBy(entity.getVerifiedBy())
+                .verifiedAt(entity.getVerifiedAt() != null ? parseInstant(entity.getVerifiedAt()) : null)
+                .societyId(entity.getSocietyId())
+                .createdAt(entity.getCreatedAt() != null ? parseInstant(entity.getCreatedAt()) : null)
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

@@ -1,5 +1,12 @@
 package com.myguard.material.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -9,14 +16,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.material.constants.MaterialConstants;
 import com.myguard.material.view.GatepassEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -82,13 +84,17 @@ public class MaterialRepositoryImpl implements MaterialRepository {
         try {
             Query query = getGatepassesCollection()
                     .whereEqualTo(MaterialConstants.FIELD_REQUESTED_BY, requestedBy)
-                    .orderBy(MaterialConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<GatepassEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(GatepassEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list gatepasses", e);
@@ -114,15 +120,19 @@ public class MaterialRepositoryImpl implements MaterialRepository {
     @Override
     public List<GatepassEntity> findAllGatepasses(String societyId, int page, int size, String status) {
         try {
-            Query query = getGatepassesCollection()
-                    .orderBy(MaterialConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getGatepassesCollection();
             if (societyId != null) query = query.whereEqualTo(MaterialConstants.FIELD_SOCIETY_ID, societyId);
             if (status != null) query = query.whereEqualTo(MaterialConstants.FIELD_STATUS, status);
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<GatepassEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(GatepassEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list all gatepasses", e);

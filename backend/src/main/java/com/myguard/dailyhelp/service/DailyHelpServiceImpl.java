@@ -1,5 +1,14 @@
 package com.myguard.dailyhelp.service;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
 import com.myguard.dailyhelp.dto.request.CreateDailyHelpRequest;
@@ -10,16 +19,9 @@ import com.myguard.dailyhelp.dto.response.DailyHelpResponse;
 import com.myguard.dailyhelp.repository.DailyHelpRepository;
 import com.myguard.dailyhelp.view.AttendanceEntity;
 import com.myguard.dailyhelp.view.DailyHelpEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,8 +43,8 @@ public class DailyHelpServiceImpl implements DailyHelpService {
                 .residentUid(uid)
                 .flatIds(request.getFlatIds())
                 .schedule(request.getSchedule())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         DailyHelpEntity saved = dailyHelpRepository.save(entity);
@@ -81,7 +83,7 @@ public class DailyHelpServiceImpl implements DailyHelpService {
         if (request.getType() != null) entity.setType(request.getType());
         if (request.getFlatIds() != null) entity.setFlatIds(request.getFlatIds());
         if (request.getSchedule() != null) entity.setSchedule(request.getSchedule());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         return mapToResponse(dailyHelpRepository.update(entity));
     }
@@ -103,10 +105,10 @@ public class DailyHelpServiceImpl implements DailyHelpService {
         AttendanceEntity attendance = AttendanceEntity.builder()
                 .dailyHelpId(dailyHelpId)
                 .guardUid(guardUid)
-                .entryTime(Instant.now())
+                .entryTime(Instant.now().toString())
                 .date(LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE))
                 .status("PRESENT")
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         AttendanceEntity saved = dailyHelpRepository.saveAttendance(attendance);
@@ -156,16 +158,22 @@ public class DailyHelpServiceImpl implements DailyHelpService {
                 .photoUrl(entity.getPhotoUrl()).type(entity.getType())
                 .residentUid(entity.getResidentUid()).flatIds(entity.getFlatIds())
                 .societyId(entity.getSocietyId()).schedule(entity.getSchedule())
-                .createdAt(entity.getCreatedAt()).updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt())).updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
     }
 
     private AttendanceResponse mapToAttendanceResponse(AttendanceEntity entity) {
         return AttendanceResponse.builder()
                 .id(entity.getId()).dailyHelpId(entity.getDailyHelpId())
-                .guardUid(entity.getGuardUid()).entryTime(entity.getEntryTime())
-                .exitTime(entity.getExitTime()).date(entity.getDate())
-                .status(entity.getStatus()).createdAt(entity.getCreatedAt())
+                .guardUid(entity.getGuardUid()).entryTime(parseInstant(entity.getEntryTime()))
+                .exitTime(parseInstant(entity.getExitTime())).date(entity.getDate())
+                .status(entity.getStatus()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -28,5 +27,5 @@ public class ListingEntity {
     private String flatId;
     private String status;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

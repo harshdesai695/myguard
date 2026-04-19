@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -26,6 +25,6 @@ public class DailyHelpEntity {
     private List<String> flatIds;
     private String societyId;
     private String schedule;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

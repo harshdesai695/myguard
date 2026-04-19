@@ -19,4 +19,7 @@ public interface EmergencyService {
     PaginatedResponse<EmergencyContactResponse> listEmergencyContacts(int page, int size, String societyId);
     EmergencyContactResponse updateEmergencyContact(String id, UpdateEmergencyContactRequest request);
     void deleteEmergencyContact(String id);
+
+    // Child Alerts
+    PaginatedResponse<com.myguard.emergency.dto.response.ChildAlertResponse> getChildAlerts(int page, int size);
 }

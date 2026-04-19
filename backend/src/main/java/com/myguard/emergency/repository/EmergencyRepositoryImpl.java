@@ -1,5 +1,12 @@
 package com.myguard.emergency.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -8,16 +15,12 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.emergency.constants.EmergencyConstants;
+import com.myguard.emergency.view.ChildAlertEntity;
 import com.myguard.emergency.view.EmergencyContactEntity;
 import com.myguard.emergency.view.PanicAlertEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -32,6 +35,10 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
 
     private CollectionReference getEmergencyContactsCollection() {
         return firestore.collection(EmergencyConstants.COLLECTION_EMERGENCY_CONTACTS);
+    }
+
+    private CollectionReference getChildAlertsCollection() {
+        return firestore.collection(EmergencyConstants.COLLECTION_CHILD_ALERTS);
     }
 
     // --- Panic Alerts ---
@@ -88,8 +95,7 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
     public List<PanicAlertEntity> findActivePanicAlerts(String societyId, int page, int size) {
         try {
             Query query = getPanicAlertsCollection()
-                    .whereEqualTo(EmergencyConstants.FIELD_STATUS, EmergencyConstants.STATUS_ACTIVE)
-                    .orderBy(EmergencyConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+                    .whereEqualTo(EmergencyConstants.FIELD_STATUS, EmergencyConstants.STATUS_ACTIVE);
 
             if (societyId != null) {
                 query = query.whereEqualTo(EmergencyConstants.FIELD_SOCIETY_ID, societyId);
@@ -97,9 +103,14 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
 
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<PanicAlertEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(PanicAlertEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list active panic alerts", e);
@@ -191,8 +202,7 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
     @Override
     public List<EmergencyContactEntity> findEmergencyContacts(String societyId, int page, int size) {
         try {
-            Query query = getEmergencyContactsCollection()
-                    .orderBy(EmergencyConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getEmergencyContactsCollection();
 
             if (societyId != null) {
                 query = query.whereEqualTo(EmergencyConstants.FIELD_SOCIETY_ID, societyId);
@@ -200,9 +210,14 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
 
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<EmergencyContactEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(EmergencyContactEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list emergency contacts", e);
@@ -224,6 +239,43 @@ public class EmergencyRepositoryImpl implements EmergencyRepository {
             throw new FirebaseOperationException("Failed to count emergency contacts", e);
         } catch (ExecutionException e) {
             throw new FirebaseOperationException("Failed to count emergency contacts", e);
+        }
+    }
+
+    @Override
+    public List<ChildAlertEntity> findChildAlertsByResidentUid(String residentUid, int page, int size) {
+        try {
+            Query query = getChildAlertsCollection()
+                    .whereEqualTo(EmergencyConstants.FIELD_RESIDENT_UID, residentUid)
+                    .offset(page * size).limit(size);
+            QuerySnapshot snapshot = query.get().get();
+            List<ChildAlertEntity> result = snapshot.getDocuments().stream()
+                    .map(doc -> doc.toObject(ChildAlertEntity.class))
+                    .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getTimestamp() == null || b.getTimestamp() == null) return 0;
+                return String.valueOf(b.getTimestamp()).compareTo(String.valueOf(a.getTimestamp()));
+            });
+            return result;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FirebaseOperationException("Failed to list child alerts", e);
+        } catch (ExecutionException e) {
+            throw new FirebaseOperationException("Failed to list child alerts", e);
+        }
+    }
+
+    @Override
+    public long countChildAlertsByResidentUid(String residentUid) {
+        try {
+            Query query = getChildAlertsCollection()
+                    .whereEqualTo(EmergencyConstants.FIELD_RESIDENT_UID, residentUid);
+            return query.get().get().size();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new FirebaseOperationException("Failed to count child alerts", e);
+        } catch (ExecutionException e) {
+            throw new FirebaseOperationException("Failed to count child alerts", e);
         }
     }
 }

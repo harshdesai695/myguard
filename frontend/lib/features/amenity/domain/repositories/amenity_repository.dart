@@ -12,4 +12,5 @@ abstract class AmenityRepository {
   Future<Either<Failure, BookingEntity>> cancelBooking(String id);
   Future<Either<Failure, AmenityEntity>> createAmenity(Map<String, dynamic> data);
   Future<Either<Failure, AmenityEntity>> updateAmenity(String id, Map<String, dynamic> data);
+  Future<Either<Failure, PaginatedResponseModel<BookingEntity>>> getAdminBookings({int page, int size});
 }

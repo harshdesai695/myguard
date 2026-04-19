@@ -1,5 +1,13 @@
 package com.myguard.auth.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.auth.constants.AuthConstants;
 import com.myguard.auth.dto.request.ChangeRoleAuthRequest;
 import com.myguard.auth.dto.request.ChangeStatusAuthRequest;
@@ -13,15 +21,9 @@ import com.myguard.common.exception.ConflictException;
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.exception.ValidationException;
 import com.myguard.common.response.PaginatedResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -72,8 +74,8 @@ public class AuthServiceImpl implements AuthService {
                 .flatId(request.getFlatId())
                 .flatNumber(request.getFlatNumber())
                 .profilePhotoUrl(request.getProfilePhotoUrl())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         UserEntity saved = authRepository.save(user);
@@ -107,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
         if (request.getProfilePhotoUrl() != null) {
             user.setProfilePhotoUrl(request.getProfilePhotoUrl());
         }
-        user.setUpdatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now().toString());
 
         UserEntity updated = authRepository.update(user);
         log.info("[AUTH] Profile updated successfully");
@@ -154,7 +156,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with UID: " + uid));
 
         user.setRole(request.getRole());
-        user.setUpdatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now().toString());
 
         UserEntity updated = authRepository.update(user);
         log.info("[AUTH] Role changed for user to: {}", request.getRole());
@@ -171,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with UID: " + uid));
 
         user.setStatus(request.getStatus());
-        user.setUpdatedAt(Instant.now());
+        user.setUpdatedAt(Instant.now().toString());
 
         UserEntity updated = authRepository.update(user);
         log.info("[AUTH] Status changed for user to: {}", request.getStatus());
@@ -199,8 +201,14 @@ public class AuthServiceImpl implements AuthService {
                 .flatId(entity.getFlatId())
                 .flatNumber(entity.getFlatNumber())
                 .profilePhotoUrl(entity.getProfilePhotoUrl())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

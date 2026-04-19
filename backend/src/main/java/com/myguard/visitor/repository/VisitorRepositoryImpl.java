@@ -1,5 +1,13 @@
 package com.myguard.visitor.repository;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -11,15 +19,9 @@ import com.myguard.visitor.constants.VisitorConstants;
 import com.myguard.visitor.view.PreApprovalEntity;
 import com.myguard.visitor.view.RecurringInviteEntity;
 import com.myguard.visitor.view.VisitorEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -93,19 +95,22 @@ public class VisitorRepositoryImpl implements VisitorRepository {
     @Override
     public List<VisitorEntity> findVisitors(int page, int size, String flatId, String status, Instant from, Instant to) {
         try {
-            Query query = getVisitorsCollection().orderBy(VisitorConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getVisitorsCollection();
 
             if (flatId != null) query = query.whereEqualTo(VisitorConstants.FIELD_FLAT_ID, flatId);
             if (status != null) query = query.whereEqualTo(VisitorConstants.FIELD_STATUS, status);
-            if (from != null) query = query.whereGreaterThanOrEqualTo(VisitorConstants.FIELD_ENTRY_TIME, from);
-            if (to != null) query = query.whereLessThanOrEqualTo(VisitorConstants.FIELD_ENTRY_TIME, to);
 
             query = query.offset(page * size).limit(size);
 
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<VisitorEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(VisitorEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list visitors", e);
@@ -221,14 +226,18 @@ public class VisitorRepositoryImpl implements VisitorRepository {
         try {
             Query query = getPreApprovalsCollection()
                     .whereEqualTo(VisitorConstants.FIELD_RESIDENT_UID, residentUid)
-                    .orderBy(VisitorConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
 
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<PreApprovalEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(PreApprovalEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list pre-approvals", e);
@@ -325,14 +334,18 @@ public class VisitorRepositoryImpl implements VisitorRepository {
         try {
             Query query = getRecurringInvitesCollection()
                     .whereEqualTo(VisitorConstants.FIELD_RESIDENT_UID, residentUid)
-                    .orderBy(VisitorConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
 
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<RecurringInviteEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(RecurringInviteEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list recurring invites", e);

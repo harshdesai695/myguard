@@ -1,24 +1,28 @@
 package com.myguard.emergency.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
 import com.myguard.emergency.constants.EmergencyConstants;
 import com.myguard.emergency.dto.request.CreateEmergencyContactRequest;
 import com.myguard.emergency.dto.request.TriggerPanicRequest;
 import com.myguard.emergency.dto.request.UpdateEmergencyContactRequest;
+import com.myguard.emergency.dto.response.ChildAlertResponse;
 import com.myguard.emergency.dto.response.EmergencyContactResponse;
 import com.myguard.emergency.dto.response.PanicAlertResponse;
 import com.myguard.emergency.repository.EmergencyRepository;
+import com.myguard.emergency.view.ChildAlertEntity;
 import com.myguard.emergency.view.EmergencyContactEntity;
 import com.myguard.emergency.view.PanicAlertEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,11 +45,11 @@ public class EmergencyServiceImpl implements EmergencyService {
         PanicAlertEntity entity = PanicAlertEntity.builder()
                 .flatId(request.getFlatId())
                 .triggeredBy(uid)
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toString())
                 .location(request.getLocation())
                 .status(EmergencyConstants.STATUS_ACTIVE)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         PanicAlertEntity saved = emergencyRepository.savePanicAlert(entity);
@@ -78,7 +82,7 @@ public class EmergencyServiceImpl implements EmergencyService {
 
         entity.setStatus(EmergencyConstants.STATUS_RESOLVED);
         entity.setResolvedBy(uid);
-        entity.setResolvedAt(Instant.now());
+        entity.setResolvedAt(Instant.now().toString());
 
         PanicAlertEntity updated = emergencyRepository.updatePanicAlert(entity);
         log.info("[EMERGENCY] Panic alert resolved: {}", id);
@@ -97,7 +101,7 @@ public class EmergencyServiceImpl implements EmergencyService {
                 .type(request.getType())
                 .address(request.getAddress())
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         EmergencyContactEntity saved = emergencyRepository.saveEmergencyContact(entity);
@@ -152,13 +156,13 @@ public class EmergencyServiceImpl implements EmergencyService {
                 .id(entity.getId())
                 .flatId(entity.getFlatId())
                 .triggeredBy(entity.getTriggeredBy())
-                .timestamp(entity.getTimestamp())
+                .timestamp(parseInstant(entity.getTimestamp()))
                 .location(entity.getLocation())
                 .status(entity.getStatus())
                 .resolvedBy(entity.getResolvedBy())
-                .resolvedAt(entity.getResolvedAt())
+                .resolvedAt(parseInstant(entity.getResolvedAt()))
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -170,7 +174,46 @@ public class EmergencyServiceImpl implements EmergencyService {
                 .type(entity.getType())
                 .address(entity.getAddress())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    @Override
+    public PaginatedResponse<ChildAlertResponse> getChildAlerts(int page, int size) {
+        String uid = getCurrentUid();
+        log.info("[EMERGENCY] Fetching child alerts for user: {}", uid);
+        List<ChildAlertEntity> alerts = emergencyRepository.findChildAlertsByResidentUid(uid, page, size);
+        long total = emergencyRepository.countChildAlertsByResidentUid(uid);
+        int totalPages = (int) Math.ceil((double) total / size);
+
+        List<ChildAlertResponse> content = alerts.stream()
+                .map(this::mapToChildAlertResponse)
+                .collect(Collectors.toList());
+
+        return PaginatedResponse.<ChildAlertResponse>builder()
+                .content(content).page(page).size(size)
+                .totalElements(total).totalPages(totalPages)
+                .hasNext(page < totalPages - 1).hasPrevious(page > 0)
+                .build();
+    }
+
+    private ChildAlertResponse mapToChildAlertResponse(ChildAlertEntity entity) {
+        return ChildAlertResponse.builder()
+                .id(entity.getId())
+                .childName(entity.getChildName())
+                .flatId(entity.getFlatId())
+                .residentUid(entity.getResidentUid())
+                .type(entity.getType())
+                .gateId(entity.getGateId())
+                .societyId(entity.getSocietyId())
+                .timestamp(parseInstant(entity.getTimestamp()))
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

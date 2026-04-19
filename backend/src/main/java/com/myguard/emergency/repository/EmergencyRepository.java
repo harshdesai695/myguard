@@ -1,10 +1,11 @@
 package com.myguard.emergency.repository;
 
-import com.myguard.emergency.view.EmergencyContactEntity;
-import com.myguard.emergency.view.PanicAlertEntity;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.myguard.emergency.view.ChildAlertEntity;
+import com.myguard.emergency.view.EmergencyContactEntity;
+import com.myguard.emergency.view.PanicAlertEntity;
 
 public interface EmergencyRepository {
 
@@ -22,4 +23,8 @@ public interface EmergencyRepository {
     void deleteEmergencyContact(String id);
     List<EmergencyContactEntity> findEmergencyContacts(String societyId, int page, int size);
     long countEmergencyContacts(String societyId);
+
+    // Child Alerts
+    List<ChildAlertEntity> findChildAlertsByResidentUid(String residentUid, int page, int size);
+    long countChildAlertsByResidentUid(String residentUid);
 }

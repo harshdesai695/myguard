@@ -1,5 +1,12 @@
 package com.myguard.pet.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
 import com.myguard.pet.dto.request.AddVaccinationRequest;
@@ -10,14 +17,9 @@ import com.myguard.pet.dto.response.VaccinationResponse;
 import com.myguard.pet.repository.PetRepository;
 import com.myguard.pet.view.PetEntity;
 import com.myguard.pet.view.VaccinationEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,7 +47,7 @@ public class PetServiceImpl implements PetService {
                 .flatId(request.getFlatId())
                 .vaccinationStatus("PENDING")
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         PetEntity saved = petRepository.savePet(entity);
@@ -110,11 +112,11 @@ public class PetServiceImpl implements PetService {
         VaccinationEntity entity = VaccinationEntity.builder()
                 .petId(petId)
                 .vaccineName(request.getVaccineName())
-                .dateAdministered(request.getDateAdministered())
-                .nextDueDate(request.getNextDueDate())
+                .dateAdministered(request.getDateAdministered() != null ? request.getDateAdministered().toString() : null)
+                .nextDueDate(request.getNextDueDate() != null ? request.getNextDueDate().toString() : null)
                 .vetName(request.getVetName())
                 .certificateUrl(request.getCertificateUrl())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         VaccinationEntity saved = petRepository.saveVaccination(entity);
@@ -139,7 +141,7 @@ public class PetServiceImpl implements PetService {
                 .age(entity.getAge()).photoUrl(entity.getPhotoUrl())
                 .ownerUid(entity.getOwnerUid()).flatId(entity.getFlatId())
                 .vaccinationStatus(entity.getVaccinationStatus())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .societyId(entity.getSocietyId()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -147,11 +149,17 @@ public class PetServiceImpl implements PetService {
         return VaccinationResponse.builder()
                 .id(entity.getId()).petId(entity.getPetId())
                 .vaccineName(entity.getVaccineName())
-                .dateAdministered(entity.getDateAdministered())
-                .nextDueDate(entity.getNextDueDate())
+                .dateAdministered(parseInstant(entity.getDateAdministered()))
+                .nextDueDate(parseInstant(entity.getNextDueDate()))
                 .vetName(entity.getVetName())
                 .certificateUrl(entity.getCertificateUrl())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

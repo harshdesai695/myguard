@@ -9,6 +9,7 @@ import 'package:myguard_frontend/features/amenity/presentation/screens/my_bookin
 import 'package:myguard_frontend/features/amenity/presentation/screens/booking_detail_screen.dart';
 import 'package:myguard_frontend/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:myguard_frontend/features/auth/presentation/bloc/auth_state.dart';
+import 'package:myguard_frontend/features/auth/presentation/bloc/user_management_cubit.dart';
 import 'package:myguard_frontend/features/auth/presentation/screens/community_screen.dart';
 import 'package:myguard_frontend/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:myguard_frontend/features/auth/presentation/screens/login_screen.dart';
@@ -20,6 +21,9 @@ import 'package:myguard_frontend/features/auth/presentation/screens/services_scr
 import 'package:myguard_frontend/features/auth/presentation/screens/splash_screen.dart';
 import 'package:myguard_frontend/features/communication/presentation/bloc/notice_cubit.dart';
 import 'package:myguard_frontend/features/communication/presentation/bloc/poll_bloc.dart';
+import 'package:myguard_frontend/features/communication/presentation/bloc/community_group_cubit.dart';
+import 'package:myguard_frontend/features/communication/presentation/bloc/document_cubit.dart';
+import 'package:myguard_frontend/features/dashboard/presentation/bloc/dashboard_cubit.dart';
 import 'package:myguard_frontend/features/communication/presentation/screens/documents_screen.dart';
 import 'package:myguard_frontend/features/communication/presentation/screens/notice_board_screen.dart';
 import 'package:myguard_frontend/features/communication/presentation/screens/notice_detail_screen.dart';
@@ -68,6 +72,7 @@ import 'package:myguard_frontend/features/guard/presentation/screens/patrol_scre
 import 'package:myguard_frontend/features/guard/presentation/screens/patrol_checkpoint_scan_screen.dart';
 import 'package:myguard_frontend/features/guard/presentation/screens/panic_alerts_screen.dart';
 import 'package:myguard_frontend/features/guard/presentation/screens/e_intercom_screen.dart';
+import 'package:myguard_frontend/features/society/presentation/bloc/society_bloc.dart';
 import 'package:myguard_frontend/features/helpdesk/presentation/bloc/helpdesk_bloc.dart';
 import 'package:myguard_frontend/features/helpdesk/presentation/screens/helpdesk_ticket_list_screen.dart';
 import 'package:myguard_frontend/features/helpdesk/presentation/screens/helpdesk_create_ticket_screen.dart';
@@ -154,10 +159,10 @@ class AppRouter {
       GoRoute(path: '/resident/helpdesk/create', builder: (_, __) => const HelpdeskCreateTicketScreen()),
       GoRoute(path: '/resident/helpdesk/:id', builder: (_, s) => HelpdeskTicketDetailScreen(ticketId: s.pathParameters['id']!)),
       GoRoute(path: '/resident/notices', builder: (_, __) => BlocProvider(create: (_) => sl<NoticeCubit>(), child: const NoticeBoardScreen())),
-      GoRoute(path: '/resident/notices/:id', builder: (_, s) => NoticeDetailScreen(noticeId: s.pathParameters['id']!)),
+      GoRoute(path: '/resident/notices/:id', builder: (_, s) => BlocProvider(create: (_) => sl<NoticeCubit>(), child: NoticeDetailScreen(noticeId: s.pathParameters['id']!))),
       GoRoute(path: '/resident/polls', builder: (_, __) => BlocProvider(create: (_) => sl<PollBloc>(), child: const PollListScreen())),
       GoRoute(path: '/resident/polls/:id', builder: (_, s) => PollVoteScreen(pollId: s.pathParameters['id']!)),
-      GoRoute(path: '/resident/documents', builder: (_, __) => const DocumentsScreen()),
+      GoRoute(path: '/resident/documents', builder: (_, __) => BlocProvider(create: (_) => sl<DocumentCubit>(), child: const DocumentsScreen())),
       GoRoute(path: '/resident/vehicles', builder: (_, __) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: const VehicleListScreen())),
       GoRoute(path: '/resident/vehicles/register', builder: (_, __) => const VehicleRegisterScreen()),
       GoRoute(path: '/resident/vehicles/:id', builder: (_, s) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: VehicleDetailScreen(vehicleId: s.pathParameters['id']!))),
@@ -167,7 +172,7 @@ class AppRouter {
       GoRoute(path: '/resident/marketplace', builder: (_, __) => BlocProvider(create: (_) => sl<MarketplaceBloc>(), child: const MarketplaceBrowseScreen())),
       GoRoute(path: '/resident/marketplace/create', builder: (_, __) => const MarketplaceCreateListingScreen()),
       GoRoute(path: '/resident/marketplace/my-listings', builder: (_, __) => BlocProvider(create: (_) => sl<MarketplaceBloc>(), child: const MyListingsScreen())),
-      GoRoute(path: '/resident/marketplace/:id', builder: (_, s) => MarketplaceListingDetailScreen(listingId: s.pathParameters['id']!)),
+      GoRoute(path: '/resident/marketplace/:id', builder: (_, s) => BlocProvider(create: (_) => sl<MarketplaceBloc>(), child: MarketplaceListingDetailScreen(listingId: s.pathParameters['id']!))),
       GoRoute(path: '/resident/pets', builder: (_, __) => BlocProvider(create: (_) => sl<PetCubit>(), child: const PetDirectoryScreen())),
       GoRoute(path: '/resident/pets/register', builder: (_, __) => const PetRegisterScreen()),
       GoRoute(path: '/resident/pets/:id', builder: (_, s) => PetProfileScreen(petId: s.pathParameters['id']!)),
@@ -175,8 +180,8 @@ class AppRouter {
       GoRoute(path: '/resident/emergency', builder: (_, __) => BlocProvider(create: (_) => sl<EmergencyCubit>(), child: const EmergencyContactsScreen())),
       GoRoute(path: '/resident/emergency/panic', builder: (_, __) => const PanicButtonScreen()),
       GoRoute(path: '/resident/emergency/child-alerts', builder: (_, __) => BlocProvider(create: (_) => sl<EmergencyCubit>(), child: const ChildAlertsScreen())),
-      GoRoute(path: '/resident/groups', builder: (_, __) => const CommunityGroupListScreen()),
-      GoRoute(path: '/resident/groups/:id', builder: (_, s) => CommunityChatScreen(groupId: s.pathParameters['id']!)),
+      GoRoute(path: '/resident/groups', builder: (_, __) => BlocProvider(create: (_) => sl<CommunityGroupCubit>(), child: const CommunityGroupListScreen())),
+      GoRoute(path: '/resident/groups/:id', builder: (_, s) => BlocProvider(create: (_) => sl<CommunityGroupCubit>(), child: CommunityChatScreen(groupId: s.pathParameters['id']!))),
       ShellRoute(builder: (_, __, child) => _GuardShell(child: child), routes: [
         GoRoute(path: '/guard', builder: (_, __) => const GuardHomeScreen()),
         GoRoute(path: '/guard/gate', builder: (_, __) => BlocProvider(create: (_) => sl<VisitorBloc>(), child: const VisitorEntryScreen())),
@@ -194,34 +199,34 @@ class AppRouter {
       GoRoute(path: '/guard/vehicle-lookup', builder: (_, __) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: const VehicleLookupScreen())),
       GoRoute(path: '/guard/material-verify', builder: (_, __) => const MaterialVerifyScreen()),
       ShellRoute(builder: (_, __, child) => _AdminShell(child: child), routes: [
-        GoRoute(path: '/admin', builder: (_, __) => const AdminHomeScreen()),
+        GoRoute(path: '/admin', builder: (_, __) => BlocProvider(create: (_) => sl<DashboardCubit>(), child: const AdminHomeScreen())),
         GoRoute(path: '/admin/manage', builder: (_, __) => const AdminManageScreen()),
         GoRoute(path: '/admin/reports', builder: (_, __) => const AdminReportsScreen()),
         GoRoute(path: '/admin/settings', builder: (_, __) => const AdminSettingsScreen()),
         GoRoute(path: '/admin/profile', builder: (_, __) => const ProfileScreen()),
       ]),
-      GoRoute(path: '/admin/society', builder: (_, __) => const SocietyManagementScreen()),
-      GoRoute(path: '/admin/flats', builder: (_, __) => const FlatManagementScreen()),
-      GoRoute(path: '/admin/users', builder: (_, __) => const UserManagementScreen()),
-      GoRoute(path: '/admin/users/:uid', builder: (_, s) => UserDetailScreen(key: ValueKey(s.pathParameters['uid']))),
-      GoRoute(path: '/admin/visitors', builder: (_, __) => const VisitorReportsScreen()),
-      GoRoute(path: '/admin/guards', builder: (_, __) => const GuardManagementScreen()),
-      GoRoute(path: '/admin/guards/shifts', builder: (_, __) => const GuardShiftScreen()),
-      GoRoute(path: '/admin/guards/patrol-report', builder: (_, __) => const GuardPatrolReportScreen()),
-      GoRoute(path: '/admin/notices', builder: (_, __) => const NoticeManagementScreen()),
-      GoRoute(path: '/admin/notices/create', builder: (_, __) => const NoticeCreateScreen()),
-      GoRoute(path: '/admin/polls', builder: (_, __) => const PollManagementScreen()),
-      GoRoute(path: '/admin/polls/create', builder: (_, __) => const PollCreateScreen()),
-      GoRoute(path: '/admin/amenities', builder: (_, __) => const AmenityManagementScreen()),
-      GoRoute(path: '/admin/amenities/bookings', builder: (_, __) => const BookingManagementScreen()),
-      GoRoute(path: '/admin/helpdesk', builder: (_, __) => const HelpdeskManagementScreen()),
-      GoRoute(path: '/admin/helpdesk/reports', builder: (_, __) => const HelpdeskReportsScreen()),
-      GoRoute(path: '/admin/vehicles', builder: (_, __) => const VehicleManagementScreen()),
-      GoRoute(path: '/admin/material-gatepasses', builder: (_, __) => const MaterialGatepassManagementScreen()),
-      GoRoute(path: '/admin/emergency-contacts', builder: (_, __) => const EmergencyContactManagementScreen()),
-      GoRoute(path: '/admin/documents', builder: (_, __) => const DocumentManagementScreen()),
-      GoRoute(path: '/admin/documents/upload', builder: (_, __) => const DocumentUploadScreen()),
-      GoRoute(path: '/admin/move-in-out', builder: (_, __) => const MoveInOutScreen()),
+      GoRoute(path: '/admin/society', builder: (_, __) => BlocProvider(create: (_) => sl<SocietyBloc>(), child: const SocietyManagementScreen())),
+      GoRoute(path: '/admin/flats', builder: (_, __) => BlocProvider(create: (_) => sl<SocietyBloc>(), child: const FlatManagementScreen())),
+      GoRoute(path: '/admin/users', builder: (_, __) => BlocProvider(create: (_) => sl<UserManagementCubit>(), child: const UserManagementScreen())),
+      GoRoute(path: '/admin/users/:uid', builder: (_, s) => BlocProvider(create: (_) => sl<UserManagementCubit>(), child: UserDetailScreen(uid: s.pathParameters['uid']!))),
+      GoRoute(path: '/admin/visitors', builder: (_, __) => BlocProvider(create: (_) => sl<DashboardCubit>(), child: const VisitorReportsScreen())),
+      GoRoute(path: '/admin/guards', builder: (_, __) => BlocProvider(create: (_) => sl<UserManagementCubit>(), child: const GuardManagementScreen())),
+      GoRoute(path: '/admin/guards/shifts', builder: (_, __) => BlocProvider(create: (_) => sl<PatrolCubit>(), child: const GuardShiftScreen())),
+      GoRoute(path: '/admin/guards/patrol-report', builder: (_, __) => BlocProvider(create: (_) => sl<PatrolCubit>(), child: const GuardPatrolReportScreen())),
+      GoRoute(path: '/admin/notices', builder: (_, __) => BlocProvider(create: (_) => sl<NoticeCubit>(), child: const NoticeManagementScreen())),
+      GoRoute(path: '/admin/notices/create', builder: (_, __) => BlocProvider(create: (_) => sl<NoticeCubit>(), child: const NoticeCreateScreen())),
+      GoRoute(path: '/admin/polls', builder: (_, __) => BlocProvider(create: (_) => sl<PollBloc>(), child: const PollManagementScreen())),
+      GoRoute(path: '/admin/polls/create', builder: (_, __) => BlocProvider(create: (_) => sl<PollBloc>(), child: const PollCreateScreen())),
+      GoRoute(path: '/admin/amenities', builder: (_, __) => BlocProvider(create: (_) => sl<AmenityBloc>(), child: const AmenityManagementScreen())),
+      GoRoute(path: '/admin/amenities/bookings', builder: (_, __) => BlocProvider(create: (_) => sl<AmenityBloc>(), child: const BookingManagementScreen())),
+      GoRoute(path: '/admin/helpdesk', builder: (_, __) => BlocProvider(create: (_) => sl<HelpdeskBloc>(), child: const HelpdeskManagementScreen())),
+      GoRoute(path: '/admin/helpdesk/reports', builder: (_, __) => BlocProvider(create: (_) => sl<HelpdeskBloc>(), child: const HelpdeskReportsScreen())),
+      GoRoute(path: '/admin/vehicles', builder: (_, __) => BlocProvider(create: (_) => sl<VehicleCubit>(), child: const VehicleManagementScreen())),
+      GoRoute(path: '/admin/material-gatepasses', builder: (_, __) => BlocProvider(create: (_) => sl<mat.MaterialCubit>(), child: const MaterialGatepassManagementScreen())),
+      GoRoute(path: '/admin/emergency-contacts', builder: (_, __) => BlocProvider(create: (_) => sl<EmergencyCubit>(), child: const EmergencyContactManagementScreen())),
+      GoRoute(path: '/admin/documents', builder: (_, __) => BlocProvider(create: (_) => sl<DocumentCubit>(), child: const DocumentManagementScreen())),
+      GoRoute(path: '/admin/documents/upload', builder: (_, __) => BlocProvider(create: (_) => sl<DocumentCubit>(), child: const DocumentUploadScreen())),
+      GoRoute(path: '/admin/move-in-out', builder: (_, __) => BlocProvider(create: (_) => sl<DashboardCubit>(), child: const MoveInOutScreen())),
     ],
   );
   static String _homeRouteForRole(String role) => switch (role) { 'ROLE_ADMIN' => '/admin', 'ROLE_GUARD' => '/guard', _ => '/resident' };

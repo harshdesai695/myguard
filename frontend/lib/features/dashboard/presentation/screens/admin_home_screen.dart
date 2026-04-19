@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
-import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:myguard_frontend/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:myguard_frontend/features/auth/presentation/bloc/auth_state.dart';
+import 'package:myguard_frontend/features/dashboard/presentation/bloc/dashboard_cubit.dart';
 import 'package:myguard_frontend/core/utils/formatters.dart';
+import 'package:myguard_frontend/shared/widgets/app_error_widget.dart';
+import 'package:myguard_frontend/shared/widgets/app_loader.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -12,30 +17,31 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
-  bool _loading = true;
-  int _residents = 0;
-  int _guards = 0;
-  int _openTickets = 0;
-  int _todayVisitors = 0;
-
   @override
-  void initState() { super.initState(); _load(); }
+  void initState() {
+    super.initState();
+    _loadDashboard();
+  }
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    // TODO: GET /api/v1/dashboard/summary?societyId=xxx
-    await Future<void>.delayed(const Duration(seconds: 1));
-    setState(() => _loading = false);
+  void _loadDashboard() {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthAuthenticated && authState.user.societyId != null) {
+      context.read<DashboardCubit>().loadSummary(authState.user.societyId!);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: _loading
-            ? const AppShimmerList(itemCount: 4, itemHeight: 100)
-            : RefreshIndicator(
-                onRefresh: _load,
+        child: BlocBuilder<DashboardCubit, DashboardState>(
+          builder: (context, state) {
+            if (state is DashboardLoading) return const AppShimmerList(itemCount: 4, itemHeight: 100);
+            if (state is DashboardError) return AppErrorWidget(message: state.message, onRetry: _loadDashboard);
+            if (state is DashboardLoaded) {
+              final s = state.summary;
+              return RefreshIndicator(
+                onRefresh: () async => _loadDashboard(),
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   padding: const EdgeInsets.all(AppSpacing.md),
@@ -45,14 +51,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     Text('Admin Dashboard', style: AppTypography.headingLarge),
                     const SizedBox(height: AppSpacing.lg),
                     GridView.count(crossAxisCount: 2, shrinkWrap: true, physics: const NeverScrollableScrollPhysics(), mainAxisSpacing: AppSpacing.sm, crossAxisSpacing: AppSpacing.sm, childAspectRatio: 1.4, children: [
-                      _DashboardCard(icon: Icons.people, label: 'Residents', value: '$_residents', color: AppColors.primary),
-                      _DashboardCard(icon: Icons.security, label: 'Guards', value: '$_guards', color: AppColors.secondary),
-                      _DashboardCard(icon: Icons.confirmation_number, label: 'Open Tickets', value: '$_openTickets', color: AppColors.warning),
-                      _DashboardCard(icon: Icons.directions_walk, label: 'Today Visitors', value: '$_todayVisitors', color: AppColors.info),
+                      _DashboardCard(icon: Icons.people, label: 'Residents', value: '${s.totalResidents}', color: AppColors.primary),
+                      _DashboardCard(icon: Icons.security, label: 'Guards', value: '${s.totalGuards}', color: AppColors.secondary),
+                      _DashboardCard(icon: Icons.confirmation_number, label: 'Open Tickets', value: '${s.totalComplaints}', color: AppColors.warning),
+                      _DashboardCard(icon: Icons.directions_walk, label: 'Today Visitors', value: '${s.totalVisitors}', color: AppColors.info),
                     ]),
                   ]),
                 ),
-              ),
+              );
+            }
+            return const AppShimmerList(itemCount: 4, itemHeight: 100);
+          },
+        ),
       ),
     );
   }

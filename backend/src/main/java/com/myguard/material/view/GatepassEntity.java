@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -22,13 +21,13 @@ public class GatepassEntity {
     private String description;
     private List<String> items;
     private String vehicleNumber;
-    private Instant expectedDate;
+    private Object expectedDate;
     private String requestedBy;
     private String flatId;
     private String status;
     private String approvedBy;
     private String verifiedBy;
-    private Instant verifiedAt;
+    private Object verifiedAt;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

@@ -10,6 +10,7 @@ import com.myguard.amenity.constants.AmenityConstants;
 import com.myguard.amenity.view.AmenityEntity;
 import com.myguard.amenity.view.BookingEntity;
 import com.myguard.common.exception.FirebaseOperationException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -85,16 +86,20 @@ public class AmenityRepositoryImpl implements AmenityRepository {
     @Override
     public List<AmenityEntity> findAmenities(String societyId, int page, int size) {
         try {
-            Query query = getAmenitiesCollection()
-                    .orderBy(AmenityConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getAmenitiesCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(AmenityConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<AmenityEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(AmenityEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list amenities", e);
@@ -172,12 +177,16 @@ public class AmenityRepositoryImpl implements AmenityRepository {
         try {
             Query query = getBookingsCollection()
                     .whereEqualTo(AmenityConstants.FIELD_RESIDENT_UID, residentUid)
-                    .orderBy(AmenityConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<BookingEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(BookingEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list bookings", e);

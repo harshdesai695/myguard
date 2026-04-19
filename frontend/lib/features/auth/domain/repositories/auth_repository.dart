@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:myguard_frontend/core/error/failures.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
 import 'package:myguard_frontend/features/auth/domain/entities/user_entity.dart';
 
 abstract class AuthRepository {
@@ -33,4 +34,17 @@ abstract class AuthRepository {
   });
 
   Future<Either<Failure, void>> signOut();
+
+  // Admin user management
+  Future<Either<Failure, PaginatedResponseModel<UserEntity>>> getUsers({
+    int page = 0,
+    int size = 20,
+    String? role,
+  });
+
+  Future<Either<Failure, UserEntity>> getUserById(String uid);
+
+  Future<Either<Failure, UserEntity>> changeUserRole(String uid, String role);
+
+  Future<Either<Failure, UserEntity>> changeUserStatus(String uid, String status);
 }

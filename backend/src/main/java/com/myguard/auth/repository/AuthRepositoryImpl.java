@@ -1,5 +1,12 @@
 package com.myguard.auth.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
@@ -11,14 +18,9 @@ import com.google.cloud.firestore.WriteResult;
 import com.myguard.auth.constants.AuthConstants;
 import com.myguard.auth.view.UserEntity;
 import com.myguard.common.exception.FirebaseOperationException;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -84,13 +86,15 @@ public class AuthRepositoryImpl implements AuthRepository {
     @Override
     public List<UserEntity> findAll(int page, int size, String roleFilter) {
         try {
-            Query query = getUsersCollection().orderBy(AuthConstants.FIELD_NAME);
+            Query query = getUsersCollection();
 
             if (roleFilter != null && !roleFilter.isBlank()) {
                 query = query.whereEqualTo(AuthConstants.FIELD_ROLE, roleFilter);
             }
 
-            query = query.offset(page * size).limit(size);
+            query = query.orderBy(AuthConstants.FIELD_NAME)
+                         .offset(page * size)
+                         .limit(size);
 
             ApiFuture<QuerySnapshot> future = query.get();
             QuerySnapshot snapshot = future.get();
@@ -102,7 +106,7 @@ public class AuthRepositoryImpl implements AuthRepository {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list users", e);
         } catch (ExecutionException e) {
-            throw new FirebaseOperationException("Failed to list users", e);
+            throw new FirebaseOperationException("Failed to list users: " + e.getMessage(), e);
         }
     }
 

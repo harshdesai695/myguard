@@ -11,6 +11,7 @@ abstract class AmenityRemoteDatasource {
   Future<BookingModel> cancelBooking(String id);
   Future<AmenityModel> createAmenity(Map<String, dynamic> data);
   Future<AmenityModel> updateAmenity(String id, Map<String, dynamic> data);
+  Future<PaginatedResponseModel<BookingModel>> getAdminBookings({int page, int size});
 }
 
 class AmenityRemoteDatasourceImpl implements AmenityRemoteDatasource {
@@ -25,4 +26,5 @@ class AmenityRemoteDatasourceImpl implements AmenityRemoteDatasource {
   @override Future<BookingModel> cancelBooking(String id) async { final r = await dioClient.patch<Map<String, dynamic>>('/amenities/bookings/$id/cancel'); return BookingModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
   @override Future<AmenityModel> createAmenity(Map<String, dynamic> data) async { final r = await dioClient.post<Map<String, dynamic>>('/amenities', data: data); return AmenityModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
   @override Future<AmenityModel> updateAmenity(String id, Map<String, dynamic> data) async { final r = await dioClient.put<Map<String, dynamic>>('/amenities/$id', data: data); return AmenityModel.fromJson(r.data!['data'] as Map<String, dynamic>); }
+  @override Future<PaginatedResponseModel<BookingModel>> getAdminBookings({int page = 0, int size = 20}) async { final r = await dioClient.get<Map<String, dynamic>>('/amenities/bookings/admin', queryParameters: {'page': page, 'size': size}); return PaginatedResponseModel.fromJson(r.data!['data'] as Map<String, dynamic>, (j) => BookingModel.fromJson(j! as Map<String, dynamic>)); }
 }

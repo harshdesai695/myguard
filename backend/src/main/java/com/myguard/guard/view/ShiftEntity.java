@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /** Firestore collection: /guard_shifts/{id} */
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class ShiftEntity {
@@ -18,5 +16,5 @@ public class ShiftEntity {
     private String endTime;
     private String date;
     private String status;
-    private Instant createdAt;
+    private Object createdAt;
 }

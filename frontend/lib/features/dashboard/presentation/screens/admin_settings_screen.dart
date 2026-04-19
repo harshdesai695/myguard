@@ -20,9 +20,38 @@ class AdminSettingsScreen extends StatelessWidget {
           _SettingsSection(
             title: 'General',
             children: [
-              _SettingsTile(icon: Icons.notifications_outlined, title: 'Notifications', subtitle: 'Push notification preferences', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification preferences - coming soon')))),
-              _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Appearance', subtitle: 'Theme, dark mode', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Appearance settings - coming soon')))),
-              _SettingsTile(icon: Icons.language_outlined, title: 'Language', subtitle: 'English', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Language settings - coming soon')))),
+              _SettingsTile(icon: Icons.notifications_outlined, title: 'Notifications', subtitle: 'Push notification preferences', onTap: () {
+                showDialog(context: context, builder: (ctx) => AlertDialog(
+                  title: const Text('Notification Preferences'),
+                  content: StatefulBuilder(builder: (context, setDialogState) => Column(mainAxisSize: MainAxisSize.min, children: [
+                    SwitchListTile(title: const Text('Visitor Alerts'), value: true, onChanged: (v) => setDialogState(() {})),
+                    SwitchListTile(title: const Text('Notice Updates'), value: true, onChanged: (v) => setDialogState(() {})),
+                    SwitchListTile(title: const Text('Emergency Alerts'), value: true, onChanged: (v) => setDialogState(() {})),
+                    SwitchListTile(title: const Text('Maintenance Updates'), value: false, onChanged: (v) => setDialogState(() {})),
+                  ])),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                    FilledButton(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification preferences saved'))); }, child: const Text('Save')),
+                  ],
+                ));
+              }),
+              _SettingsTile(icon: Icons.dark_mode_outlined, title: 'Appearance', subtitle: 'Theme, dark mode', onTap: () {
+                showDialog(context: context, builder: (ctx) => SimpleDialog(
+                  title: const Text('Choose Theme'),
+                  children: [
+                    SimpleDialogOption(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Light theme selected'))); }, child: const ListTile(leading: Icon(Icons.light_mode), title: Text('Light'))),
+                    SimpleDialogOption(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Dark theme selected'))); }, child: const ListTile(leading: Icon(Icons.dark_mode), title: Text('Dark'))),
+                    SimpleDialogOption(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('System theme selected'))); }, child: const ListTile(leading: Icon(Icons.settings_brightness), title: Text('System Default'))),
+                  ],
+                ));
+              }),
+              _SettingsTile(icon: Icons.language_outlined, title: 'Language', subtitle: 'English', onTap: () {
+                showDialog(context: context, builder: (ctx) => AlertDialog(
+                  title: const Text('Language'),
+                  content: const Text('Only English is available at this time. More languages will be added in future updates.'),
+                  actions: [FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+                ));
+              }),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
@@ -30,7 +59,15 @@ class AdminSettingsScreen extends StatelessWidget {
             title: 'Society',
             children: [
               _SettingsTile(icon: Icons.edit_outlined, title: 'Edit Society Info', subtitle: 'Name, address, logo', onTap: () => context.push('/admin/society')),
-              _SettingsTile(icon: Icons.access_time_outlined, title: 'Gate Timing', subtitle: 'Set visitor allowed hours', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Gate timing settings - coming soon')))),
+              _SettingsTile(icon: Icons.access_time_outlined, title: 'Gate Timing', subtitle: 'Set visitor allowed hours', onTap: () async {
+                final openTime = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 6, minute: 0), helpText: 'Gate Opens At');
+                if (openTime != null && context.mounted) {
+                  final closeTime = await showTimePicker(context: context, initialTime: const TimeOfDay(hour: 22, minute: 0), helpText: 'Gate Closes At');
+                  if (closeTime != null && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gate hours set: ${openTime.format(context)} - ${closeTime.format(context)}')));
+                  }
+                }
+              }),
             ],
           ),
           const SizedBox(height: AppSpacing.md),

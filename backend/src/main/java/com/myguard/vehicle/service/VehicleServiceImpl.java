@@ -1,5 +1,12 @@
 package com.myguard.vehicle.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
 import com.myguard.vehicle.dto.request.AllocateParkingRequest;
@@ -13,14 +20,9 @@ import com.myguard.vehicle.repository.VehicleRepository;
 import com.myguard.vehicle.view.ParkingSlotEntity;
 import com.myguard.vehicle.view.VehicleEntity;
 import com.myguard.vehicle.view.VisitorVehicleLogEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -47,7 +49,7 @@ public class VehicleServiceImpl implements VehicleService {
                 .ownerUid(uid)
                 .flatId(request.getFlatId())
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         VehicleEntity saved = vehicleRepository.saveVehicle(entity);
@@ -121,7 +123,7 @@ public class VehicleServiceImpl implements VehicleService {
                 .type(request.getType())
                 .allocatedVehicleId(request.getAllocatedVehicleId())
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         ParkingSlotEntity saved = vehicleRepository.saveParkingSlot(entity);
@@ -152,10 +154,10 @@ public class VehicleServiceImpl implements VehicleService {
 
         VisitorVehicleLogEntity entity = VisitorVehicleLogEntity.builder()
                 .plateNumber(request.getPlateNumber())
-                .entryTime(Instant.now())
+                .entryTime(Instant.now().toString())
                 .visitorEntryId(request.getVisitorEntryId())
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         VisitorVehicleLogEntity saved = vehicleRepository.saveVisitorVehicleLog(entity);
@@ -189,7 +191,7 @@ public class VehicleServiceImpl implements VehicleService {
                 .colour(entity.getColour()).type(entity.getType())
                 .ownerUid(entity.getOwnerUid()).flatId(entity.getFlatId())
                 .parkingSlotId(entity.getParkingSlotId())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .societyId(entity.getSocietyId()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -198,16 +200,22 @@ public class VehicleServiceImpl implements VehicleService {
                 .id(entity.getId()).slotNumber(entity.getSlotNumber())
                 .blockZone(entity.getBlockZone()).type(entity.getType())
                 .allocatedVehicleId(entity.getAllocatedVehicleId())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .societyId(entity.getSocietyId()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
     private VisitorVehicleLogResponse mapToVisitorVehicleLogResponse(VisitorVehicleLogEntity entity) {
         return VisitorVehicleLogResponse.builder()
                 .id(entity.getId()).plateNumber(entity.getPlateNumber())
-                .entryTime(entity.getEntryTime()).exitTime(entity.getExitTime())
+                .entryTime(parseInstant(entity.getEntryTime())).exitTime(parseInstant(entity.getExitTime()))
                 .visitorEntryId(entity.getVisitorEntryId())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .societyId(entity.getSocietyId()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

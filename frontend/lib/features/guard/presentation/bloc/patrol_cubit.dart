@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myguard_frontend/features/guard/domain/entities/guard_entity.dart';
 import 'package:myguard_frontend/features/guard/domain/usecases/get_checkpoints_usecase.dart';
 import 'package:myguard_frontend/features/guard/domain/usecases/log_patrol_usecase.dart';
+import 'package:myguard_frontend/features/guard/domain/usecases/guard_usecases.dart';
 
 sealed class PatrolState extends Equatable {
   const PatrolState();
@@ -14,6 +15,11 @@ class CheckpointsLoaded extends PatrolState {
   const CheckpointsLoaded(this.checkpoints);
   final List<CheckpointEntity> checkpoints;
   @override List<Object> get props => [checkpoints];
+}
+class ShiftsLoaded extends PatrolState {
+  const ShiftsLoaded(this.shifts);
+  final List<ShiftEntity> shifts;
+  @override List<Object> get props => [shifts];
 }
 class PatrolLoggedSuccess extends PatrolState {
   const PatrolLoggedSuccess(this.message);
@@ -27,11 +33,27 @@ class PatrolError extends PatrolState {
 }
 
 class PatrolCubit extends Cubit<PatrolState> {
-  PatrolCubit({required GetCheckpointsUseCase getCheckpointsUseCase, required LogPatrolUseCase logPatrolUseCase})
-      : _getCheckpointsUseCase = getCheckpointsUseCase, _logPatrolUseCase = logPatrolUseCase, super(const PatrolInitial());
+  PatrolCubit({
+    required GetCheckpointsUseCase getCheckpointsUseCase,
+    required LogPatrolUseCase logPatrolUseCase,
+    required GetShiftsUseCase getShiftsUseCase,
+    required CreateShiftUseCase createShiftUseCase,
+    required SendIntercomUseCase sendIntercomUseCase,
+    required GetPatrolsUseCase getPatrolsUseCase,
+  }) : _getCheckpointsUseCase = getCheckpointsUseCase,
+       _logPatrolUseCase = logPatrolUseCase,
+       _getShiftsUseCase = getShiftsUseCase,
+       _createShiftUseCase = createShiftUseCase,
+       _sendIntercomUseCase = sendIntercomUseCase,
+       _getPatrolsUseCase = getPatrolsUseCase,
+       super(const PatrolInitial());
 
   final GetCheckpointsUseCase _getCheckpointsUseCase;
   final LogPatrolUseCase _logPatrolUseCase;
+  final GetShiftsUseCase _getShiftsUseCase;
+  final CreateShiftUseCase _createShiftUseCase;
+  final SendIntercomUseCase _sendIntercomUseCase;
+  final GetPatrolsUseCase _getPatrolsUseCase;
 
   Future<void> loadCheckpoints() async {
     emit(const PatrolLoading());
@@ -42,5 +64,22 @@ class PatrolCubit extends Cubit<PatrolState> {
   Future<void> logPatrol({required String checkpointId, String? notes, required String societyId}) async {
     final result = await _logPatrolUseCase(checkpointId: checkpointId, notes: notes, societyId: societyId);
     result.fold((f) => emit(PatrolError(f.message)), (_) => emit(const PatrolLoggedSuccess('Patrol checkpoint scanned')));
+  }
+
+  Future<void> loadShifts() async {
+    emit(const PatrolLoading());
+    final result = await _getShiftsUseCase();
+    result.fold((f) => emit(PatrolError(f.message)), (p) => emit(ShiftsLoaded(p.content)));
+  }
+
+  Future<void> createShift(Map<String, dynamic> data) async {
+    emit(const PatrolLoading());
+    final result = await _createShiftUseCase(data);
+    result.fold((f) => emit(PatrolError(f.message)), (_) => emit(const PatrolLoggedSuccess('Shift created')));
+  }
+
+  Future<void> sendIntercom(String flatId, Map<String, dynamic> data) async {
+    final result = await _sendIntercomUseCase(flatId, data);
+    result.fold((f) => emit(PatrolError(f.message)), (_) => emit(const PatrolLoggedSuccess('Intercom sent')));
   }
 }

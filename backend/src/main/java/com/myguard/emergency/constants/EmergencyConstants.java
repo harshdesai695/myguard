@@ -17,4 +17,8 @@ public final class EmergencyConstants {
 
     public static final String STATUS_ACTIVE = "ACTIVE";
     public static final String STATUS_RESOLVED = "RESOLVED";
+
+    public static final String COLLECTION_CHILD_ALERTS = "child_alerts";
+    public static final String FIELD_RESIDENT_UID = "residentUid";
+    public static final String FIELD_TIMESTAMP = "timestamp";
 }

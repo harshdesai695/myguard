@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -20,11 +19,11 @@ public class PollEntity {
     private String id;
     private String question;
     private List<String> options;
-    private Instant startDate;
-    private Instant endDate;
+    private Object startDate;
+    private Object endDate;
     private boolean isSecret;
     private boolean allowMultipleVotes;
     private String createdBy;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

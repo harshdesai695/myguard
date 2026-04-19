@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 
 /**
  * Firestore collection: /vehicles/{id}
@@ -26,5 +25,5 @@ public class VehicleEntity {
     private String flatId;
     private String parkingSlotId;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

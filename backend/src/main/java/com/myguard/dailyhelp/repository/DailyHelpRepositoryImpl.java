@@ -1,23 +1,24 @@
 package com.myguard.dailyhelp.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
-import com.google.cloud.firestore.QuerySnapshot;
 import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.dailyhelp.constants.DailyHelpConstants;
 import com.myguard.dailyhelp.view.AttendanceEntity;
 import com.myguard.dailyhelp.view.DailyHelpEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -86,11 +87,15 @@ public class DailyHelpRepositoryImpl implements DailyHelpRepository {
         try {
             Query query = getDailyHelpsCollection()
                     .whereEqualTo(DailyHelpConstants.FIELD_RESIDENT_UID, residentUid)
-                    .orderBy(DailyHelpConstants.FIELD_NAME)
                     .offset(page * size).limit(size);
-            return query.get().get().getDocuments().stream()
+            List<DailyHelpEntity> result = query.get().get().getDocuments().stream()
                     .map(doc -> doc.toObject(DailyHelpEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getName() == null || b.getName() == null) return 0;
+                return a.getName().compareToIgnoreCase(b.getName());
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list daily helps", e);
@@ -135,11 +140,15 @@ public class DailyHelpRepositoryImpl implements DailyHelpRepository {
         try {
             Query query = getAttendanceCollection()
                     .whereEqualTo(DailyHelpConstants.FIELD_DAILY_HELP_ID, dailyHelpId)
-                    .orderBy(DailyHelpConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size).limit(size);
-            return query.get().get().getDocuments().stream()
+            List<AttendanceEntity> result = query.get().get().getDocuments().stream()
                     .map(doc -> doc.toObject(AttendanceEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list attendance", e);

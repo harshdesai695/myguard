@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /recurring_invites/{id}
  * Document ID: Auto-generated
@@ -24,7 +22,7 @@ public class RecurringInviteEntity {
     private String residentUid;
     private String societyId;
     private String status;
-    private Instant validFrom;
-    private Instant validUntil;
-    private Instant createdAt;
+    private Object validFrom;
+    private Object validUntil;
+    private Object createdAt;
 }

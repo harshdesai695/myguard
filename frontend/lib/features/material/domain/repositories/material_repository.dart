@@ -9,4 +9,5 @@ abstract class MaterialRepository {
   Future<Either<Failure, GatepassEntity>> createGatepass(Map<String, dynamic> data);
   Future<Either<Failure, GatepassEntity>> approveGatepass(String id);
   Future<Either<Failure, GatepassEntity>> verifyGatepass(String id);
+  Future<Either<Failure, PaginatedResponseModel<GatepassEntity>>> getAdminGatepasses({int page, int size});
 }

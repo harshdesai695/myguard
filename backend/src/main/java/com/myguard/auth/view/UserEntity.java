@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /users/{uid}
  * Document ID: Firebase UID
@@ -26,6 +24,6 @@ public class UserEntity {
     private String flatId;
     private String flatNumber;
     private String profilePhotoUrl;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

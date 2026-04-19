@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /** Firestore collection: /guard_patrols/{id} */
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class PatrolEntity {
@@ -14,7 +12,7 @@ public class PatrolEntity {
     private String guardUid;
     private String checkpointId;
     private String societyId;
-    private Instant scannedAt;
+    private Object scannedAt;
     private String notes;
-    private Instant createdAt;
+    private Object createdAt;
 }

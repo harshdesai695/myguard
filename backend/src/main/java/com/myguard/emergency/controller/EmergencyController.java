@@ -1,16 +1,5 @@
 package com.myguard.emergency.controller;
 
-import com.myguard.common.response.ApiResponse;
-import com.myguard.common.response.PaginatedResponse;
-import com.myguard.emergency.dto.request.CreateEmergencyContactRequest;
-import com.myguard.emergency.dto.request.TriggerPanicRequest;
-import com.myguard.emergency.dto.request.UpdateEmergencyContactRequest;
-import com.myguard.emergency.dto.response.EmergencyContactResponse;
-import com.myguard.emergency.dto.response.PanicAlertResponse;
-import com.myguard.emergency.service.EmergencyService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +13,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.myguard.common.response.ApiResponse;
+import com.myguard.common.response.PaginatedResponse;
+import com.myguard.emergency.dto.request.CreateEmergencyContactRequest;
+import com.myguard.emergency.dto.request.TriggerPanicRequest;
+import com.myguard.emergency.dto.request.UpdateEmergencyContactRequest;
+import com.myguard.emergency.dto.response.ChildAlertResponse;
+import com.myguard.emergency.dto.response.EmergencyContactResponse;
+import com.myguard.emergency.dto.response.PanicAlertResponse;
+import com.myguard.emergency.service.EmergencyService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
@@ -94,5 +97,16 @@ public class EmergencyController {
     public ResponseEntity<ApiResponse<Void>> deleteContact(@PathVariable String id) {
         emergencyService.deleteEmergencyContact(id);
         return ResponseEntity.ok(ApiResponse.success(null, "Emergency contact deleted"));
+    }
+
+    // --- Child Alerts ---
+
+    @GetMapping("/child-alerts")
+    @PreAuthorize("hasRole('RESIDENT')")
+    public ResponseEntity<ApiResponse<PaginatedResponse<ChildAlertResponse>>> getChildAlerts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        PaginatedResponse<ChildAlertResponse> response = emergencyService.getChildAlerts(page, size);
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 }

@@ -1,54 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myguard_frontend/design_system/app_colors.dart';
 import 'package:myguard_frontend/design_system/app_spacing.dart';
 import 'package:myguard_frontend/design_system/app_typography.dart';
 import 'package:myguard_frontend/core/utils/formatters.dart';
-import 'package:myguard_frontend/shared/widgets/app_loader.dart';
+import 'package:myguard_frontend/features/auth/presentation/bloc/auth_bloc.dart';
+import 'package:myguard_frontend/features/auth/presentation/bloc/auth_state.dart';
 
-class ResidentHomeScreen extends StatefulWidget {
+class ResidentHomeScreen extends StatelessWidget {
   const ResidentHomeScreen({super.key});
-  @override
-  State<ResidentHomeScreen> createState() => _ResidentHomeScreenState();
-}
-
-class _ResidentHomeScreenState extends State<ResidentHomeScreen> {
-  bool _loading = true;
-
-  @override
-  void initState() { super.initState(); _load(); }
-
-  Future<void> _load() async {
-    setState(() => _loading = true);
-    // TODO: GET /api/v1/auth/profile + recent visitors
-    await Future<void>.delayed(const Duration(seconds: 1));
-    setState(() => _loading = false);
-  }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Scaffold(body: AppShimmerList(itemCount: 6, itemHeight: 80));
-    return Scaffold(
-      body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: _load,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(Formatters.greeting(), style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600)),
-              const SizedBox(height: AppSpacing.xxs),
-              Text('Welcome Home', style: AppTypography.headingLarge),
-              const SizedBox(height: AppSpacing.lg),
-              _QuickActionsGrid(),
-              const SizedBox(height: AppSpacing.lg),
-              Text('Recent Activity', style: AppTypography.titleLarge),
-              const SizedBox(height: AppSpacing.sm),
-              Card(child: Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: Center(child: Text('No recent visitors', style: AppTypography.bodyMedium.copyWith(color: AppColors.grey500))))),
-            ]),
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        final userName = state is AuthAuthenticated ? state.user.name : 'Resident';
+        return Scaffold(
+          body: SafeArea(
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(Formatters.greeting(), style: AppTypography.bodyMedium.copyWith(color: AppColors.grey600)),
+                const SizedBox(height: AppSpacing.xxs),
+                Text('Welcome, $userName', style: AppTypography.headingLarge),
+                const SizedBox(height: AppSpacing.lg),
+                _QuickActionsGrid(),
+                const SizedBox(height: AppSpacing.lg),
+                Text('Recent Activity', style: AppTypography.titleLarge),
+                const SizedBox(height: AppSpacing.sm),
+                Card(child: Padding(padding: const EdgeInsets.all(AppSpacing.lg), child: Center(child: Text('No recent visitors', style: AppTypography.bodyMedium.copyWith(color: AppColors.grey500))))),
+              ]),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

@@ -7,7 +7,7 @@ class AmenityEntity extends Equatable {
 }
 
 class BookingEntity extends Equatable {
-  const BookingEntity({required this.id, required this.amenityId, required this.residentUid, required this.slotDate, required this.startTime, required this.endTime, required this.status, this.flatId, this.notes, this.checkedInAt, this.checkedOutAt, this.societyId, this.createdAt});
-  final String id; final String amenityId; final String residentUid; final String slotDate; final String startTime; final String endTime; final String status; final String? flatId; final String? notes; final DateTime? checkedInAt; final DateTime? checkedOutAt; final String? societyId; final DateTime? createdAt;
+  const BookingEntity({required this.id, this.amenityId = '', this.residentUid = '', this.slotDate = '', this.startTime = '', this.endTime = '', this.status = '', this.flatId, this.notes, this.checkedInAt, this.checkedOutAt, this.societyId, this.createdAt, this.companions = 0});
+  final String id; final String amenityId; final String residentUid; final String slotDate; final String startTime; final String endTime; final String status; final String? flatId; final String? notes; final DateTime? checkedInAt; final DateTime? checkedOutAt; final String? societyId; final DateTime? createdAt; final int companions;
   @override List<Object?> get props => [id, amenityId, status];
 }

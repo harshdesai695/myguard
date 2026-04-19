@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 
 /**
  * Firestore collection: /marketplace_interests/{id}
@@ -20,5 +19,5 @@ public class InterestEntity {
     private String listingId;
     private String interestedBy;
     private String message;
-    private Instant createdAt;
+    private Object createdAt;
 }

@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 
 /**
  * Firestore collection: /daily_help_attendance/{id}
@@ -19,9 +18,9 @@ public class AttendanceEntity {
     private String id;
     private String dailyHelpId;
     private String guardUid;
-    private Instant entryTime;
-    private Instant exitTime;
+    private Object entryTime;
+    private Object exitTime;
     private String date;
     private String status;
-    private Instant createdAt;
+    private Object createdAt;
 }

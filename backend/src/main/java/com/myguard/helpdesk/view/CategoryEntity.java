@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -22,5 +21,5 @@ public class CategoryEntity {
     private String description;
     private List<String> subCategories;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

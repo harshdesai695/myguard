@@ -1,5 +1,12 @@
 package com.myguard.helpdesk.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -11,14 +18,9 @@ import com.myguard.helpdesk.constants.HelpdeskConstants;
 import com.myguard.helpdesk.view.CategoryEntity;
 import com.myguard.helpdesk.view.CommentEntity;
 import com.myguard.helpdesk.view.TicketEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -94,13 +96,17 @@ public class HelpdeskRepositoryImpl implements HelpdeskRepository {
         try {
             Query query = getTicketsCollection()
                     .whereEqualTo(HelpdeskConstants.FIELD_RAISED_BY, raisedBy)
-                    .orderBy(HelpdeskConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<TicketEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(TicketEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list tickets", e);
@@ -126,16 +132,20 @@ public class HelpdeskRepositoryImpl implements HelpdeskRepository {
     @Override
     public List<TicketEntity> findAllTickets(String societyId, int page, int size, String status, String category) {
         try {
-            Query query = getTicketsCollection()
-                    .orderBy(HelpdeskConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getTicketsCollection();
             if (societyId != null) query = query.whereEqualTo(HelpdeskConstants.FIELD_SOCIETY_ID, societyId);
             if (status != null) query = query.whereEqualTo(HelpdeskConstants.FIELD_STATUS, status);
             if (category != null) query = query.whereEqualTo(HelpdeskConstants.FIELD_CATEGORY, category);
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<TicketEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(TicketEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list all tickets", e);
@@ -199,16 +209,20 @@ public class HelpdeskRepositoryImpl implements HelpdeskRepository {
     @Override
     public List<CategoryEntity> findCategories(String societyId, int page, int size) {
         try {
-            Query query = getCategoriesCollection()
-                    .orderBy(HelpdeskConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getCategoriesCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(HelpdeskConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<CategoryEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(CategoryEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list categories", e);
@@ -261,11 +275,15 @@ public class HelpdeskRepositoryImpl implements HelpdeskRepository {
         try {
             QuerySnapshot snapshot = getCommentsCollection()
                     .whereEqualTo(HelpdeskConstants.FIELD_TICKET_ID, ticketId)
-                    .orderBy(HelpdeskConstants.FIELD_CREATED_AT, Query.Direction.ASCENDING)
                     .get().get();
-            return snapshot.getDocuments().stream()
+            List<CommentEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(CommentEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(a.getCreatedAt()).compareTo(String.valueOf(b.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list comments", e);

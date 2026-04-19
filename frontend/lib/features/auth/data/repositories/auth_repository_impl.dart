@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:myguard_frontend/core/error/exceptions.dart';
 import 'package:myguard_frontend/core/error/failures.dart';
 import 'package:myguard_frontend/core/firebase/auth_service.dart';
+import 'package:myguard_frontend/core/network/paginated_response_model.dart';
 import 'package:myguard_frontend/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:myguard_frontend/features/auth/data/models/user_model.dart';
 import 'package:myguard_frontend/features/auth/domain/entities/user_entity.dart';
@@ -122,6 +123,58 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       await authService.signOut();
       return const Right(null);
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PaginatedResponseModel<UserEntity>>> getUsers({
+    int page = 0,
+    int size = 20,
+    String? role,
+  }) async {
+    try {
+      final result = await remoteDatasource.getUsers(page: page, size: size, role: role);
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(_mapDioError(e));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> getUserById(String uid) async {
+    try {
+      final result = await remoteDatasource.getUserById(uid);
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(_mapDioError(e));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> changeUserRole(String uid, String role) async {
+    try {
+      final result = await remoteDatasource.changeUserRole(uid, role);
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(_mapDioError(e));
+    } catch (e) {
+      return Left(UnknownFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> changeUserStatus(String uid, String status) async {
+    try {
+      final result = await remoteDatasource.changeUserStatus(uid, status);
+      return Right(result);
+    } on DioException catch (e) {
+      return Left(_mapDioError(e));
     } catch (e) {
       return Left(UnknownFailure(e.toString()));
     }

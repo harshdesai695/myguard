@@ -1,6 +1,12 @@
 package com.myguard.guard.repository;
 
-import com.google.cloud.firestore.CollectionReference;
+import java.time.Instant;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
@@ -11,14 +17,9 @@ import com.myguard.guard.view.CheckpointEntity;
 import com.myguard.guard.view.IntercomEntity;
 import com.myguard.guard.view.PatrolEntity;
 import com.myguard.guard.view.ShiftEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -90,13 +91,17 @@ public class GuardRepositoryImpl implements GuardRepository {
     @Override
     public List<PatrolEntity> findPatrols(int page, int size, String guardUid, Instant from, Instant to) {
         try {
-            Query query = firestore.collection(GuardConstants.COLLECTION_PATROLS)
-                    .orderBy(GuardConstants.FIELD_SCANNED_AT, Query.Direction.DESCENDING);
+            Query query = firestore.collection(GuardConstants.COLLECTION_PATROLS);
             if (guardUid != null) query = query.whereEqualTo(GuardConstants.FIELD_GUARD_UID, guardUid);
             if (from != null) query = query.whereGreaterThanOrEqualTo(GuardConstants.FIELD_SCANNED_AT, from);
             if (to != null) query = query.whereLessThanOrEqualTo(GuardConstants.FIELD_SCANNED_AT, to);
             QuerySnapshot snapshot = query.offset(page * size).limit(size).get().get();
-            return snapshot.getDocuments().stream().map(d -> d.toObject(PatrolEntity.class)).collect(Collectors.toList());
+            List<PatrolEntity> result = snapshot.getDocuments().stream().map(d -> d.toObject(PatrolEntity.class)).collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getScannedAt() == null || b.getScannedAt() == null) return 0;
+                return String.valueOf(b.getScannedAt()).compareTo(String.valueOf(a.getScannedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list patrols", e);

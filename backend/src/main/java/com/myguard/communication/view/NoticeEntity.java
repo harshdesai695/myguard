@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -23,9 +22,9 @@ public class NoticeEntity {
     private String type;
     private List<String> attachments;
     private String postedBy;
-    private Instant postedAt;
-    private Instant expiryDate;
+    private Object postedAt;
+    private Object expiryDate;
     private String societyId;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

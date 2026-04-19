@@ -1,5 +1,12 @@
 package com.myguard.communication.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -14,14 +21,9 @@ import com.myguard.communication.view.MessageEntity;
 import com.myguard.communication.view.NoticeEntity;
 import com.myguard.communication.view.PollEntity;
 import com.myguard.communication.view.PollVoteEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -120,16 +122,20 @@ public class CommunicationRepositoryImpl implements CommunicationRepository {
     @Override
     public List<NoticeEntity> findNotices(String societyId, int page, int size) {
         try {
-            Query query = getNoticesCollection()
-                    .orderBy(CommunicationConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getNoticesCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(CommunicationConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<NoticeEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(NoticeEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list notices", e);
@@ -193,16 +199,20 @@ public class CommunicationRepositoryImpl implements CommunicationRepository {
     @Override
     public List<PollEntity> findPolls(String societyId, int page, int size) {
         try {
-            Query query = getPollsCollection()
-                    .orderBy(CommunicationConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getPollsCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(CommunicationConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<PollEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(PollEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list polls", e);
@@ -324,16 +334,20 @@ public class CommunicationRepositoryImpl implements CommunicationRepository {
     @Override
     public List<GroupEntity> findGroups(String societyId, int page, int size) {
         try {
-            Query query = getGroupsCollection()
-                    .orderBy(CommunicationConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getGroupsCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(CommunicationConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<GroupEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(GroupEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list groups", e);
@@ -386,13 +400,17 @@ public class CommunicationRepositoryImpl implements CommunicationRepository {
         try {
             Query query = getMessagesCollection()
                     .whereEqualTo(CommunicationConstants.FIELD_GROUP_ID, groupId)
-                    .orderBy(CommunicationConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<MessageEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(MessageEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list messages", e);
@@ -454,16 +472,20 @@ public class CommunicationRepositoryImpl implements CommunicationRepository {
     @Override
     public List<DocumentEntity> findDocuments(String societyId, int page, int size) {
         try {
-            Query query = getDocumentsCollection()
-                    .orderBy(CommunicationConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getDocumentsCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(CommunicationConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<DocumentEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(DocumentEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list documents", e);

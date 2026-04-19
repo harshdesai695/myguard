@@ -101,13 +101,85 @@ class ProfileScreen extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Column(
                     children: [
-                      _MenuTile(icon: Icons.edit_outlined, title: 'Edit Profile', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Edit profile - coming soon')))),
+                      _MenuTile(icon: Icons.edit_outlined, title: 'Edit Profile', onTap: () {
+                        showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          builder: (ctx) => Padding(
+                            padding: EdgeInsets.only(left: 16, right: 16, top: 16, bottom: MediaQuery.of(ctx).viewInsets.bottom + 16),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Edit Profile', style: Theme.of(context).textTheme.titleLarge),
+                                const SizedBox(height: 16),
+                                TextFormField(initialValue: user.name, decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()), readOnly: true),
+                                const SizedBox(height: 12),
+                                TextFormField(initialValue: user.phone, decoration: const InputDecoration(labelText: 'Phone', border: OutlineInputBorder()), readOnly: true),
+                                const SizedBox(height: 12),
+                                TextFormField(initialValue: user.email, decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()), readOnly: true),
+                                const SizedBox(height: 12),
+                                Text('Profile editing requires backend connection.', style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.onSurfaceVariant)),
+                                const SizedBox(height: 16),
+                                SizedBox(width: double.infinity, child: FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close'))),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.lock_outline, title: 'Change Password', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Change password - coming soon')))),
+                      _MenuTile(icon: Icons.lock_outline, title: 'Change Password', onTap: () {
+                        context.read<AuthBloc>().add(AuthForgotPasswordRequested(email: user.email));
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password reset email sent')));
+                      }),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.notifications_outlined, title: 'Notifications', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification settings - coming soon')))),
+                      _MenuTile(icon: Icons.notifications_outlined, title: 'Notifications', onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Notification Preferences'),
+                            content: StatefulBuilder(
+                              builder: (context, setDialogState) {
+                                return Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SwitchListTile(title: const Text('Visitor Alerts'), value: true, onChanged: (v) => setDialogState(() {})),
+                                    SwitchListTile(title: const Text('Notice Updates'), value: true, onChanged: (v) => setDialogState(() {})),
+                                    SwitchListTile(title: const Text('Community Messages'), value: false, onChanged: (v) => setDialogState(() {})),
+                                  ],
+                                );
+                              },
+                            ),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                              FilledButton(onPressed: () { Navigator.pop(ctx); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Notification preferences saved'))); }, child: const Text('Save')),
+                            ],
+                          ),
+                        );
+                      }),
                       const Divider(height: 1),
-                      _MenuTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Help & support - coming soon')))),
+                      _MenuTile(icon: Icons.help_outline, title: 'Help & Support', onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Help & Support'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('MyGuard - Smart Society Management'),
+                                const SizedBox(height: 8),
+                                Text('Version: 1.0.0', style: Theme.of(context).textTheme.bodySmall),
+                                const SizedBox(height: 8),
+                                const Text('For support, contact:'),
+                                const SizedBox(height: 4),
+                                Text('support@myguard.app', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.primary)),
+                              ],
+                            ),
+                            actions: [FilledButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+                          ),
+                        );
+                      }),
                     ],
                   ),
                 ),

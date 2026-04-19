@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /emergency_contacts/{id}
  * Document ID: Auto-generated
@@ -22,5 +20,5 @@ public class EmergencyContactEntity {
     private String type;
     private String address;
     private String societyId;
-    private Instant createdAt;
+    private Object createdAt;
 }

@@ -1,6 +1,12 @@
 package com.myguard.society.repository;
 
-import com.google.api.core.ApiFuture;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -12,14 +18,9 @@ import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.society.constants.SocietyConstants;
 import com.myguard.society.view.FlatEntity;
 import com.myguard.society.view.SocietyEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -175,14 +176,18 @@ public class SocietyRepositoryImpl implements SocietyRepository {
         try {
             Query query = getFlatsCollection()
                     .whereEqualTo(SocietyConstants.FIELD_SOCIETY_ID, societyId)
-                    .orderBy(SocietyConstants.FIELD_FLAT_NUMBER)
                     .offset(page * size)
                     .limit(size);
 
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<FlatEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(FlatEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getFlatNumber() == null || b.getFlatNumber() == null) return 0;
+                return a.getFlatNumber().compareToIgnoreCase(b.getFlatNumber());
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list flats", e);

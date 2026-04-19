@@ -1,5 +1,12 @@
 package com.myguard.marketplace.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -10,14 +17,9 @@ import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.marketplace.constants.MarketplaceConstants;
 import com.myguard.marketplace.view.InterestEntity;
 import com.myguard.marketplace.view.ListingEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -99,15 +101,19 @@ public class MarketplaceRepositoryImpl implements MarketplaceRepository {
     public List<ListingEntity> findListings(String societyId, String category, int page, int size) {
         try {
             Query query = getListingsCollection()
-                    .whereEqualTo(MarketplaceConstants.FIELD_STATUS, MarketplaceConstants.STATUS_ACTIVE)
-                    .orderBy(MarketplaceConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+                    .whereEqualTo(MarketplaceConstants.FIELD_STATUS, MarketplaceConstants.STATUS_ACTIVE);
             if (societyId != null) query = query.whereEqualTo(MarketplaceConstants.FIELD_SOCIETY_ID, societyId);
             if (category != null) query = query.whereEqualTo(MarketplaceConstants.FIELD_CATEGORY, category);
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<ListingEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(ListingEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list listings", e);
@@ -158,11 +164,15 @@ public class MarketplaceRepositoryImpl implements MarketplaceRepository {
         try {
             QuerySnapshot snapshot = getInterestsCollection()
                     .whereEqualTo(MarketplaceConstants.FIELD_LISTING_ID, listingId)
-                    .orderBy(MarketplaceConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .get().get();
-            return snapshot.getDocuments().stream()
+            List<InterestEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(InterestEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list interests", e);

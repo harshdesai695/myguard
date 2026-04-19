@@ -1,5 +1,12 @@
 package com.myguard.pet.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -10,14 +17,9 @@ import com.myguard.common.exception.FirebaseOperationException;
 import com.myguard.pet.constants.PetConstants;
 import com.myguard.pet.view.PetEntity;
 import com.myguard.pet.view.VaccinationEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -98,16 +100,20 @@ public class PetRepositoryImpl implements PetRepository {
     @Override
     public List<PetEntity> findPets(String societyId, int page, int size) {
         try {
-            Query query = getPetsCollection()
-                    .orderBy(PetConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getPetsCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(PetConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<PetEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(PetEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list pets", e);
@@ -158,11 +164,15 @@ public class PetRepositoryImpl implements PetRepository {
         try {
             QuerySnapshot snapshot = getVaccinationsCollection()
                     .whereEqualTo(PetConstants.FIELD_PET_ID, petId)
-                    .orderBy(PetConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .get().get();
-            return snapshot.getDocuments().stream()
+            List<VaccinationEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(VaccinationEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list vaccinations", e);

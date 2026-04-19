@@ -1,5 +1,11 @@
 package com.myguard.society.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
 import com.myguard.society.constants.SocietyConstants;
@@ -12,13 +18,9 @@ import com.myguard.society.dto.response.SocietyResponse;
 import com.myguard.society.repository.SocietyRepository;
 import com.myguard.society.view.FlatEntity;
 import com.myguard.society.view.SocietyEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -41,8 +43,8 @@ public class SocietyServiceImpl implements SocietyService {
                 .totalFlats(request.getTotalFlats())
                 .logoUrl(request.getLogoUrl())
                 .status(SocietyConstants.STATUS_ACTIVE)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         SocietyEntity saved = societyRepository.saveSociety(entity);
@@ -94,7 +96,7 @@ public class SocietyServiceImpl implements SocietyService {
         if (request.getTotalFlats() != null) entity.setTotalFlats(request.getTotalFlats());
         if (request.getLogoUrl() != null) entity.setLogoUrl(request.getLogoUrl());
         if (request.getStatus() != null) entity.setStatus(request.getStatus());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         SocietyEntity updated = societyRepository.updateSociety(entity);
         log.info("[SOCIETY] Society updated with ID: {}", id);
@@ -118,8 +120,8 @@ public class SocietyServiceImpl implements SocietyService {
                         ? SocietyConstants.FLAT_STATUS_OCCUPIED
                         : SocietyConstants.FLAT_STATUS_VACANT)
                 .primaryResidentUid(request.getPrimaryResidentUid())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         FlatEntity saved = societyRepository.saveFlat(entity);
@@ -178,7 +180,7 @@ public class SocietyServiceImpl implements SocietyService {
         if (request.getType() != null) entity.setType(request.getType());
         if (request.getStatus() != null) entity.setStatus(request.getStatus());
         if (request.getPrimaryResidentUid() != null) entity.setPrimaryResidentUid(request.getPrimaryResidentUid());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         FlatEntity updated = societyRepository.updateFlat(entity);
         log.info("[SOCIETY] Flat updated with ID: {}", flatId);
@@ -205,8 +207,8 @@ public class SocietyServiceImpl implements SocietyService {
                 .totalFlats(entity.getTotalFlats())
                 .logoUrl(entity.getLogoUrl())
                 .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
     }
 
@@ -220,8 +222,14 @@ public class SocietyServiceImpl implements SocietyService {
                 .type(entity.getType())
                 .status(entity.getStatus())
                 .primaryResidentUid(entity.getPrimaryResidentUid())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

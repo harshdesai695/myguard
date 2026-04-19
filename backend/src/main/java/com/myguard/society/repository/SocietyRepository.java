@@ -1,11 +1,10 @@
 package com.myguard.society.repository;
 
-import com.myguard.auth.dto.response.UserAuthResponse;
-import com.myguard.society.view.FlatEntity;
-import com.myguard.society.view.SocietyEntity;
-
 import java.util.List;
 import java.util.Optional;
+
+import com.myguard.society.view.FlatEntity;
+import com.myguard.society.view.SocietyEntity;
 
 public interface SocietyRepository {
     SocietyEntity saveSociety(SocietyEntity society);

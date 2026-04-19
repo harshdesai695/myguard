@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /amenity_bookings/{id}
  * Document ID: Auto-generated
@@ -26,6 +24,6 @@ public class BookingEntity {
     private int companions;
     private String status;
     private String societyId;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

@@ -1,5 +1,13 @@
 package com.myguard.helpdesk.service;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.exception.ValidationException;
 import com.myguard.common.response.PaginatedResponse;
@@ -18,16 +26,9 @@ import com.myguard.helpdesk.repository.HelpdeskRepository;
 import com.myguard.helpdesk.view.CategoryEntity;
 import com.myguard.helpdesk.view.CommentEntity;
 import com.myguard.helpdesk.view.TicketEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -56,8 +57,8 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .status(HelpdeskConstants.STATUS_OPEN)
                 .priority(request.getPriority() != null ? request.getPriority() : HelpdeskConstants.PRIORITY_MEDIUM)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         TicketEntity saved = helpdeskRepository.saveTicket(entity);
@@ -96,7 +97,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
         entity.setStatus(request.getStatus());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         TicketEntity updated = helpdeskRepository.updateTicket(entity);
         log.info("[HELPDESK] Ticket status updated: {} -> {}", id, request.getStatus());
@@ -110,7 +111,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
 
         entity.setAssignedTo(request.getAssignedTo());
         entity.setStatus(HelpdeskConstants.STATUS_IN_PROGRESS);
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         TicketEntity updated = helpdeskRepository.updateTicket(entity);
         log.info("[HELPDESK] Ticket assigned: {} -> {}", id, request.getAssignedTo());
@@ -127,7 +128,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .ticketId(ticketId)
                 .authorUid(uid)
                 .content(request.getContent())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         CommentEntity saved = helpdeskRepository.saveComment(entity);
@@ -152,7 +153,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
 
         entity.setRating(request.getRating());
         entity.setRatingComment(request.getComment());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         TicketEntity updated = helpdeskRepository.updateTicket(entity);
         log.info("[HELPDESK] Ticket rated: {} with rating: {}", id, request.getRating());
@@ -185,7 +186,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .description(request.getDescription())
                 .subCategories(request.getSubCategories())
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         CategoryEntity saved = helpdeskRepository.saveCategory(entity);
@@ -244,12 +245,12 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .status(entity.getStatus())
                 .priority(entity.getPriority())
                 .assignedTo(entity.getAssignedTo())
-                .slaDeadline(entity.getSlaDeadline())
+                .slaDeadline(parseInstant(entity.getSlaDeadline()))
                 .rating(entity.getRating())
                 .ratingComment(entity.getRatingComment())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
     }
 
@@ -260,7 +261,7 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .description(entity.getDescription())
                 .subCategories(entity.getSubCategories())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -270,7 +271,13 @@ public class HelpdeskServiceImpl implements HelpdeskService {
                 .ticketId(entity.getTicketId())
                 .authorUid(entity.getAuthorUid())
                 .content(entity.getContent())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

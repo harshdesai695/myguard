@@ -42,6 +42,34 @@ class VisitorRejected extends VisitorEvent {
   List<Object> get props => [id];
 }
 
+class VisitorEntryLogged extends VisitorEvent {
+  const VisitorEntryLogged({
+    required this.visitorName,
+    required this.visitorPhone,
+    required this.purpose,
+    required this.flatId,
+    this.photoUrl,
+    this.vehicleNumber,
+    this.preApprovalId,
+  });
+  final String visitorName;
+  final String visitorPhone;
+  final String purpose;
+  final String flatId;
+  final String? photoUrl;
+  final String? vehicleNumber;
+  final String? preApprovalId;
+  @override
+  List<Object?> get props => [visitorName, visitorPhone, purpose, flatId, photoUrl, vehicleNumber, preApprovalId];
+}
+
+class VisitorExitMarked extends VisitorEvent {
+  const VisitorExitMarked(this.id);
+  final String id;
+  @override
+  List<Object> get props => [id];
+}
+
 sealed class VisitorState extends Equatable {
   const VisitorState();
   @override

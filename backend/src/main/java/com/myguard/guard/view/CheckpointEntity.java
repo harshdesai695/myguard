@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /** Firestore collection: /guard_checkpoints/{id} */
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CheckpointEntity {
@@ -17,5 +15,5 @@ public class CheckpointEntity {
     private double latitude;
     private double longitude;
     private String qrCode;
-    private Instant createdAt;
+    private Object createdAt;
 }

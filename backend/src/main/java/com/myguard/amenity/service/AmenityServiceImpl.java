@@ -1,5 +1,13 @@
 package com.myguard.amenity.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
+import com.google.api.pathtemplate.ValidationException;
 import com.myguard.amenity.constants.AmenityConstants;
 import com.myguard.amenity.dto.request.CreateAmenityRequest;
 import com.myguard.amenity.dto.request.CreateBookingRequest;
@@ -10,16 +18,10 @@ import com.myguard.amenity.repository.AmenityRepository;
 import com.myguard.amenity.view.AmenityEntity;
 import com.myguard.amenity.view.BookingEntity;
 import com.myguard.common.exception.ResourceNotFoundException;
-import com.myguard.common.exception.ValidationException;
 import com.myguard.common.response.PaginatedResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -46,8 +48,8 @@ public class AmenityServiceImpl implements AmenityService {
                 .maintenanceClosureDates(request.getMaintenanceClosureDates())
                 .societyId(request.getSocietyId())
                 .status(AmenityConstants.STATUS_ACTIVE)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         AmenityEntity saved = amenityRepository.saveAmenity(entity);
@@ -92,7 +94,7 @@ public class AmenityServiceImpl implements AmenityService {
         if (request.getCoolDownMinutes() != null) entity.setCoolDownMinutes(request.getCoolDownMinutes());
         if (request.getMaintenanceClosureDates() != null) entity.setMaintenanceClosureDates(request.getMaintenanceClosureDates());
         if (request.getStatus() != null) entity.setStatus(request.getStatus());
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
 
         AmenityEntity updated = amenityRepository.updateAmenity(entity);
         log.info("[AMENITY] Amenity updated: {}", id);
@@ -137,8 +139,8 @@ public class AmenityServiceImpl implements AmenityService {
                 .companions(request.getCompanions())
                 .status(AmenityConstants.BOOKING_CONFIRMED)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         BookingEntity saved = amenityRepository.saveBooking(entity);
@@ -182,7 +184,7 @@ public class AmenityServiceImpl implements AmenityService {
         }
 
         entity.setStatus(AmenityConstants.BOOKING_CANCELLED);
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
         BookingEntity updated = amenityRepository.updateBooking(entity);
         log.info("[AMENITY] Booking cancelled: {}", id);
         return mapToBookingResponse(updated);
@@ -198,7 +200,7 @@ public class AmenityServiceImpl implements AmenityService {
         }
 
         entity.setStatus(AmenityConstants.BOOKING_CHECKED_IN);
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
         BookingEntity updated = amenityRepository.updateBooking(entity);
         log.info("[AMENITY] Booking checked in: {}", id);
         return mapToBookingResponse(updated);
@@ -214,7 +216,7 @@ public class AmenityServiceImpl implements AmenityService {
         }
 
         entity.setStatus(AmenityConstants.BOOKING_CHECKED_OUT);
-        entity.setUpdatedAt(Instant.now());
+        entity.setUpdatedAt(Instant.now().toString());
         BookingEntity updated = amenityRepository.updateBooking(entity);
         log.info("[AMENITY] Booking checked out: {}", id);
         return mapToBookingResponse(updated);
@@ -249,8 +251,8 @@ public class AmenityServiceImpl implements AmenityService {
                 .maintenanceClosureDates(entity.getMaintenanceClosureDates())
                 .societyId(entity.getSocietyId())
                 .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
     }
 
@@ -266,8 +268,14 @@ public class AmenityServiceImpl implements AmenityService {
                 .companions(entity.getCompanions())
                 .status(entity.getStatus())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
+                .updatedAt(parseInstant(entity.getUpdatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

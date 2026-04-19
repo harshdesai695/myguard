@@ -1,5 +1,12 @@
 package com.myguard.marketplace.service;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ForbiddenException;
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.response.PaginatedResponse;
@@ -12,14 +19,9 @@ import com.myguard.marketplace.dto.response.ListingResponse;
 import com.myguard.marketplace.repository.MarketplaceRepository;
 import com.myguard.marketplace.view.InterestEntity;
 import com.myguard.marketplace.view.ListingEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,7 +50,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 .flatId(request.getFlatId())
                 .status(MarketplaceConstants.STATUS_ACTIVE)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         ListingEntity saved = marketplaceRepository.saveListing(entity);
@@ -126,7 +128,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 .listingId(listingId)
                 .interestedBy(uid)
                 .message(request.getMessage())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         InterestEntity saved = marketplaceRepository.saveInterest(entity);
@@ -157,7 +159,7 @@ public class MarketplaceServiceImpl implements MarketplaceService {
                 .category(entity.getCategory()).price(entity.getPrice())
                 .condition(entity.getCondition()).postedBy(entity.getPostedBy())
                 .flatId(entity.getFlatId()).status(entity.getStatus())
-                .societyId(entity.getSocietyId()).createdAt(entity.getCreatedAt())
+                .societyId(entity.getSocietyId()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -165,7 +167,13 @@ public class MarketplaceServiceImpl implements MarketplaceService {
         return InterestResponse.builder()
                 .id(entity.getId()).listingId(entity.getListingId())
                 .interestedBy(entity.getInterestedBy())
-                .message(entity.getMessage()).createdAt(entity.getCreatedAt())
+                .message(entity.getMessage()).createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

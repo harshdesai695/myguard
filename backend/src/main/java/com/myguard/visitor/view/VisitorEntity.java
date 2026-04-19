@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
-
 /**
  * Firestore collection: /visitors/{id}
  * Document ID: Auto-generated
@@ -24,8 +22,8 @@ public class VisitorEntity {
     private String flatId;
     private String residentUid;
     private String societyId;
-    private Instant entryTime;
-    private Instant exitTime;
+    private Object entryTime;
+    private Object exitTime;
     private String status;
     private String vehicleNumber;
     private String guardUid;
@@ -33,6 +31,6 @@ public class VisitorEntity {
     private String inviteCode;
     private boolean isGroupEntry;
     private int groupSize;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

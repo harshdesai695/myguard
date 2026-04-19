@@ -1,5 +1,15 @@
 package com.myguard.visitor.service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ForbiddenException;
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.exception.ValidationException;
@@ -17,17 +27,9 @@ import com.myguard.visitor.repository.VisitorRepository;
 import com.myguard.visitor.view.PreApprovalEntity;
 import com.myguard.visitor.view.RecurringInviteEntity;
 import com.myguard.visitor.view.VisitorEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,6 +37,7 @@ import java.util.stream.Collectors;
 public class VisitorServiceImpl implements VisitorService {
 
     private final VisitorRepository visitorRepository;
+    private final com.myguard.auth.repository.AuthRepository authRepository;
 
     @Override
     public PreApprovalResponse createPreApproval(CreatePreApprovalRequest request) {
@@ -50,9 +53,9 @@ public class VisitorServiceImpl implements VisitorService {
                 .residentUid(uid)
                 .inviteCode(generateInviteCode())
                 .status(VisitorConstants.STATUS_ACTIVE)
-                .validFrom(Instant.now())
-                .validUntil(Instant.now().plus(validHours, ChronoUnit.HOURS))
-                .createdAt(Instant.now())
+                .validFrom(Instant.now().toString())
+                .validUntil(Instant.now().plus(validHours, ChronoUnit.HOURS).toString())
+                .createdAt(Instant.now().toString())
                 .build();
 
         PreApprovalEntity saved = visitorRepository.savePreApproval(entity);
@@ -103,7 +106,7 @@ public class VisitorServiceImpl implements VisitorService {
                 .photoUrl(request.getPhotoUrl())
                 .purpose(request.getPurpose())
                 .flatId(request.getFlatId())
-                .entryTime(Instant.now())
+                .entryTime(Instant.now().toString())
                 .status(VisitorConstants.STATUS_PENDING)
                 .vehicleNumber(request.getVehicleNumber())
                 .guardUid(guardUid)
@@ -111,8 +114,8 @@ public class VisitorServiceImpl implements VisitorService {
                 .inviteCode(request.getInviteCode())
                 .isGroupEntry(false)
                 .groupSize(1)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         // Auto-approve if pre-approval or valid invite code exists
@@ -120,7 +123,7 @@ public class VisitorServiceImpl implements VisitorService {
             visitorRepository.findPreApprovalById(request.getPreApprovalId())
                     .ifPresent(pa -> {
                         if (VisitorConstants.STATUS_ACTIVE.equals(pa.getStatus())
-                                && pa.getValidUntil().isAfter(Instant.now())) {
+                                && parseInstant(pa.getValidUntil()) != null && parseInstant(pa.getValidUntil()).isAfter(Instant.now())) {
                             entity.setStatus(VisitorConstants.STATUS_APPROVED);
                             entity.setResidentUid(pa.getResidentUid());
                         }
@@ -144,7 +147,7 @@ public class VisitorServiceImpl implements VisitorService {
 
         visitor.setStatus(VisitorConstants.STATUS_APPROVED);
         visitor.setResidentUid(uid);
-        visitor.setUpdatedAt(Instant.now());
+        visitor.setUpdatedAt(Instant.now().toString());
 
         VisitorEntity updated = visitorRepository.updateVisitor(visitor);
         log.info("[VISITOR] Visitor entry approved: {}", id);
@@ -163,7 +166,7 @@ public class VisitorServiceImpl implements VisitorService {
 
         visitor.setStatus(VisitorConstants.STATUS_REJECTED);
         visitor.setResidentUid(uid);
-        visitor.setUpdatedAt(Instant.now());
+        visitor.setUpdatedAt(Instant.now().toString());
 
         VisitorEntity updated = visitorRepository.updateVisitor(visitor);
         log.info("[VISITOR] Visitor entry rejected: {}", id);
@@ -179,9 +182,9 @@ public class VisitorServiceImpl implements VisitorService {
             throw new ValidationException("Visitor must be in approved status to log exit");
         }
 
-        visitor.setExitTime(Instant.now());
+        visitor.setExitTime(Instant.now().toString());
         visitor.setStatus(VisitorConstants.STATUS_COMPLETED);
-        visitor.setUpdatedAt(Instant.now());
+        visitor.setUpdatedAt(Instant.now().toString());
 
         VisitorEntity updated = visitorRepository.updateVisitor(visitor);
         log.info("[VISITOR] Visitor exit logged: {}", id);
@@ -190,6 +193,18 @@ public class VisitorServiceImpl implements VisitorService {
 
     @Override
     public PaginatedResponse<VisitorResponse> listVisitors(int page, int size, String flatId, String status, Instant from, Instant to) {
+        // For residents, force filter by their own flatId
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isResident = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_RESIDENT"));
+        if (isResident && (flatId == null || flatId.isBlank())) {
+            String uid = getCurrentUid();
+            var userOpt = authRepository.findByUid(uid);
+            if (userOpt.isPresent() && userOpt.get().getFlatId() != null) {
+                flatId = userOpt.get().getFlatId();
+            }
+        }
+
         List<VisitorEntity> visitors = visitorRepository.findVisitors(page, size, flatId, status, from, to);
         long total = visitorRepository.countVisitors(flatId, status, from, to);
         int totalPages = (int) Math.ceil((double) total / size);
@@ -223,9 +238,9 @@ public class VisitorServiceImpl implements VisitorService {
                 .purpose(request.getPurpose())
                 .residentUid(uid)
                 .status(VisitorConstants.STATUS_ACTIVE)
-                .validFrom(request.getValidFrom())
-                .validUntil(request.getValidUntil())
-                .createdAt(Instant.now())
+                .validFrom(request.getValidFrom() != null ? request.getValidFrom().toString() : null)
+                .validUntil(request.getValidUntil() != null ? request.getValidUntil().toString() : null)
+                .createdAt(Instant.now().toString())
                 .build();
 
         RecurringInviteEntity saved = visitorRepository.saveRecurringInvite(entity);
@@ -279,9 +294,9 @@ public class VisitorServiceImpl implements VisitorService {
                 .residentUid(uid)
                 .inviteCode(generateInviteCode())
                 .status(VisitorConstants.STATUS_ACTIVE)
-                .validFrom(Instant.now())
-                .validUntil(Instant.now().plus(validHours, ChronoUnit.HOURS))
-                .createdAt(Instant.now())
+                .validFrom(Instant.now().toString())
+                .validUntil(Instant.now().plus(validHours, ChronoUnit.HOURS).toString())
+                .createdAt(Instant.now().toString())
                 .build();
 
         PreApprovalEntity saved = visitorRepository.savePreApproval(entity);
@@ -298,7 +313,7 @@ public class VisitorServiceImpl implements VisitorService {
             throw new ValidationException("Invite code is no longer active");
         }
 
-        if (entity.getValidUntil().isBefore(Instant.now())) {
+        if (parseInstant(entity.getValidUntil()) != null && parseInstant(entity.getValidUntil()).isBefore(Instant.now())) {
             throw new ValidationException("Invite code has expired");
         }
 
@@ -338,14 +353,14 @@ public class VisitorServiceImpl implements VisitorService {
                     .photoUrl(detail.getPhotoUrl())
                     .purpose(request.getPurpose())
                     .flatId(request.getFlatId())
-                    .entryTime(Instant.now())
+                    .entryTime(Instant.now().toString())
                     .status(VisitorConstants.STATUS_PENDING)
                     .vehicleNumber(request.getVehicleNumber())
                     .guardUid(guardUid)
                     .isGroupEntry(true)
                     .groupSize(request.getVisitors().size())
-                    .createdAt(Instant.now())
-                    .updatedAt(Instant.now())
+                    .createdAt(Instant.now().toString())
+                    .updatedAt(Instant.now().toString())
                     .build();
 
             VisitorEntity saved = visitorRepository.saveVisitor(entity);
@@ -374,8 +389,8 @@ public class VisitorServiceImpl implements VisitorService {
                 .flatId(entity.getFlatId())
                 .residentUid(entity.getResidentUid())
                 .societyId(entity.getSocietyId())
-                .entryTime(entity.getEntryTime())
-                .exitTime(entity.getExitTime())
+                .entryTime(parseInstant(entity.getEntryTime()))
+                .exitTime(parseInstant(entity.getExitTime()))
                 .status(entity.getStatus())
                 .vehicleNumber(entity.getVehicleNumber())
                 .guardUid(entity.getGuardUid())
@@ -383,7 +398,7 @@ public class VisitorServiceImpl implements VisitorService {
                 .inviteCode(entity.getInviteCode())
                 .isGroupEntry(entity.isGroupEntry())
                 .groupSize(entity.getGroupSize())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -397,9 +412,9 @@ public class VisitorServiceImpl implements VisitorService {
                 .residentUid(entity.getResidentUid())
                 .inviteCode(entity.getInviteCode())
                 .status(entity.getStatus())
-                .validFrom(entity.getValidFrom())
-                .validUntil(entity.getValidUntil())
-                .createdAt(entity.getCreatedAt())
+                .validFrom(parseInstant(entity.getValidFrom()))
+                .validUntil(parseInstant(entity.getValidUntil()))
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -412,9 +427,15 @@ public class VisitorServiceImpl implements VisitorService {
                 .flatId(entity.getFlatId())
                 .residentUid(entity.getResidentUid())
                 .status(entity.getStatus())
-                .validFrom(entity.getValidFrom())
-                .validUntil(entity.getValidUntil())
-                .createdAt(entity.getCreatedAt())
+                .validFrom(parseInstant(entity.getValidFrom()))
+                .validUntil(parseInstant(entity.getValidUntil()))
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

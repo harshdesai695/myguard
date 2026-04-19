@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 
 /**
  * Firestore collection: /group_messages/{id}
@@ -21,6 +20,6 @@ public class MessageEntity {
     private String senderUid;
     private String content;
     private String attachmentUrl;
-    private Instant sentAt;
-    private Instant createdAt;
+    private Object sentAt;
+    private Object createdAt;
 }

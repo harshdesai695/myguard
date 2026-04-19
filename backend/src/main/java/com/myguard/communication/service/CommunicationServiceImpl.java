@@ -1,5 +1,14 @@
 package com.myguard.communication.service;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.myguard.common.exception.ResourceNotFoundException;
 import com.myguard.common.exception.ValidationException;
 import com.myguard.common.response.PaginatedResponse;
@@ -22,16 +31,9 @@ import com.myguard.communication.view.MessageEntity;
 import com.myguard.communication.view.NoticeEntity;
 import com.myguard.communication.view.PollEntity;
 import com.myguard.communication.view.PollVoteEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,11 +59,11 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .type(request.getType())
                 .attachments(request.getAttachments())
                 .postedBy(uid)
-                .postedAt(Instant.now())
-                .expiryDate(request.getExpiryDate())
+                .postedAt(Instant.now().toString())
+                .expiryDate(request.getExpiryDate() != null ? request.getExpiryDate().toString() : null)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
+                .createdAt(Instant.now().toString())
+                .updatedAt(Instant.now().toString())
                 .build();
 
         NoticeEntity saved = communicationRepository.saveNotice(entity);
@@ -102,8 +104,8 @@ public class CommunicationServiceImpl implements CommunicationService {
         if (request.getBody() != null) entity.setBody(request.getBody());
         if (request.getType() != null) entity.setType(request.getType());
         if (request.getAttachments() != null) entity.setAttachments(request.getAttachments());
-        if (request.getExpiryDate() != null) entity.setExpiryDate(request.getExpiryDate());
-        entity.setUpdatedAt(Instant.now());
+        if (request.getExpiryDate() != null) entity.setExpiryDate(request.getExpiryDate().toString());
+        entity.setUpdatedAt(Instant.now().toString());
 
         NoticeEntity updated = communicationRepository.updateNotice(entity);
         log.info("[COMMUNICATION] Notice updated: {}", id);
@@ -128,13 +130,13 @@ public class CommunicationServiceImpl implements CommunicationService {
         PollEntity entity = PollEntity.builder()
                 .question(request.getQuestion())
                 .options(request.getOptions())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
+                .startDate(request.getStartDate() != null ? request.getStartDate().toString() : null)
+                .endDate(request.getEndDate() != null ? request.getEndDate().toString() : null)
                 .isSecret(request.isSecret())
                 .allowMultipleVotes(request.isAllowMultipleVotes())
                 .createdBy(uid)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         PollEntity saved = communicationRepository.savePoll(entity);
@@ -179,7 +181,7 @@ public class CommunicationServiceImpl implements CommunicationService {
         PollEntity poll = communicationRepository.findPollById(pollId)
                 .orElseThrow(() -> new ResourceNotFoundException("Poll not found"));
 
-        if (Instant.now().isAfter(poll.getEndDate())) {
+        if (parseInstant(poll.getEndDate()) != null && Instant.now().isAfter(parseInstant(poll.getEndDate()))) {
             throw new ValidationException("Poll has ended");
         }
 
@@ -199,7 +201,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .pollId(pollId)
                 .voterUid(poll.isSecret() ? null : uid)
                 .selectedOptions(request.getSelectedOptions())
-                .votedAt(Instant.now())
+                .votedAt(Instant.now().toString())
                 .build();
 
         communicationRepository.savePollVote(vote);
@@ -220,7 +222,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .memberUids(request.getMemberUids())
                 .createdBy(uid)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         GroupEntity saved = communicationRepository.saveGroup(entity);
@@ -258,8 +260,8 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .senderUid(uid)
                 .content(request.getContent())
                 .attachmentUrl(request.getAttachmentUrl())
-                .sentAt(Instant.now())
-                .createdAt(Instant.now())
+                .sentAt(Instant.now().toString())
+                .createdAt(Instant.now().toString())
                 .build();
 
         MessageEntity saved = communicationRepository.saveMessage(entity);
@@ -303,7 +305,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .fileType(request.getFileType())
                 .uploadedBy(uid)
                 .societyId(request.getSocietyId())
-                .createdAt(Instant.now())
+                .createdAt(Instant.now().toString())
                 .build();
 
         DocumentEntity saved = communicationRepository.saveDocument(entity);
@@ -343,8 +345,10 @@ public class CommunicationServiceImpl implements CommunicationService {
             results.put(option, 0L);
         }
         for (PollVoteEntity vote : votes) {
-            for (String selected : vote.getSelectedOptions()) {
-                results.merge(selected, 1L, Long::sum);
+            if (vote.getSelectedOptions() != null) {
+                for (String selected : vote.getSelectedOptions()) {
+                    results.merge(selected, 1L, Long::sum);
+                }
             }
         }
         return results;
@@ -360,10 +364,10 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .type(entity.getType())
                 .attachments(entity.getAttachments())
                 .postedBy(entity.getPostedBy())
-                .postedAt(entity.getPostedAt())
-                .expiryDate(entity.getExpiryDate())
+                .postedAt(parseInstant(entity.getPostedAt()))
+                .expiryDate(parseInstant(entity.getExpiryDate()))
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -372,15 +376,15 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .id(entity.getId())
                 .question(entity.getQuestion())
                 .options(entity.getOptions())
-                .startDate(entity.getStartDate())
-                .endDate(entity.getEndDate())
+                .startDate(parseInstant(entity.getStartDate()))
+                .endDate(parseInstant(entity.getEndDate()))
                 .isSecret(entity.isSecret())
                 .allowMultipleVotes(entity.isAllowMultipleVotes())
                 .createdBy(entity.getCreatedBy())
                 .societyId(entity.getSocietyId())
                 .results(results)
                 .totalVotes(totalVotes)
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -393,7 +397,7 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .memberUids(entity.getMemberUids())
                 .createdBy(entity.getCreatedBy())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -404,8 +408,8 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .senderUid(entity.getSenderUid())
                 .content(entity.getContent())
                 .attachmentUrl(entity.getAttachmentUrl())
-                .sentAt(entity.getSentAt())
-                .createdAt(entity.getCreatedAt())
+                .sentAt(parseInstant(entity.getSentAt()))
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
     }
 
@@ -420,7 +424,13 @@ public class CommunicationServiceImpl implements CommunicationService {
                 .fileType(entity.getFileType())
                 .uploadedBy(entity.getUploadedBy())
                 .societyId(entity.getSocietyId())
-                .createdAt(entity.getCreatedAt())
+                .createdAt(parseInstant(entity.getCreatedAt()))
                 .build();
+    }
+
+    private Instant parseInstant(Object v) {
+        if (v == null) return null;
+        if (v instanceof com.google.cloud.Timestamp t) return t.toDate().toInstant();
+        try { return Instant.parse(v.toString()); } catch (Exception e) { return null; }
     }
 }

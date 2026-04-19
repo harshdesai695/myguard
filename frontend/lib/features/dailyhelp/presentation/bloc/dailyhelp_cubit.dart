@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:myguard_frontend/features/dailyhelp/domain/entities/dailyhelp_entity.dart';
 import 'package:myguard_frontend/features/dailyhelp/domain/usecases/get_daily_helps_usecase.dart';
 import 'package:myguard_frontend/features/dailyhelp/domain/usecases/mark_attendance_usecase.dart';
+import 'package:myguard_frontend/features/dailyhelp/domain/usecases/dailyhelp_usecases.dart';
 
 // States
 sealed class DailyHelpState extends Equatable {
@@ -41,12 +42,21 @@ class DailyHelpCubit extends Cubit<DailyHelpState> {
   DailyHelpCubit({
     required GetDailyHelpsUseCase getDailyHelpsUseCase,
     required MarkAttendanceUseCase markAttendanceUseCase,
+    required CreateDailyHelpUseCase createDailyHelpUseCase,
+    required UpdateDailyHelpUseCase updateDailyHelpUseCase,
+    required DeleteDailyHelpUseCase deleteDailyHelpUseCase,
   })  : _getDailyHelpsUseCase = getDailyHelpsUseCase,
         _markAttendanceUseCase = markAttendanceUseCase,
+        _createDailyHelpUseCase = createDailyHelpUseCase,
+        _updateDailyHelpUseCase = updateDailyHelpUseCase,
+        _deleteDailyHelpUseCase = deleteDailyHelpUseCase,
         super(const DailyHelpInitial());
 
   final GetDailyHelpsUseCase _getDailyHelpsUseCase;
   final MarkAttendanceUseCase _markAttendanceUseCase;
+  final CreateDailyHelpUseCase _createDailyHelpUseCase;
+  final UpdateDailyHelpUseCase _updateDailyHelpUseCase;
+  final DeleteDailyHelpUseCase _deleteDailyHelpUseCase;
   final List<DailyHelpEntity> _items = [];
 
   Future<void> loadDailyHelps({int page = 0}) async {
@@ -63,6 +73,32 @@ class DailyHelpCubit extends Cubit<DailyHelpState> {
     result.fold(
       (f) => emit(DailyHelpError(f.message)),
       (_) => emit(const DailyHelpActionSuccess('Attendance marked')),
+    );
+  }
+
+  Future<void> createDailyHelp(Map<String, dynamic> data) async {
+    emit(const DailyHelpLoading());
+    final result = await _createDailyHelpUseCase(data);
+    result.fold(
+      (f) => emit(DailyHelpError(f.message)),
+      (_) => emit(const DailyHelpActionSuccess('Daily help registered')),
+    );
+  }
+
+  Future<void> updateDailyHelp(String id, Map<String, dynamic> data) async {
+    emit(const DailyHelpLoading());
+    final result = await _updateDailyHelpUseCase(id, data);
+    result.fold(
+      (f) => emit(DailyHelpError(f.message)),
+      (_) => emit(const DailyHelpActionSuccess('Daily help updated')),
+    );
+  }
+
+  Future<void> deleteDailyHelp(String id) async {
+    final result = await _deleteDailyHelpUseCase(id);
+    result.fold(
+      (f) => emit(DailyHelpError(f.message)),
+      (_) => emit(const DailyHelpActionSuccess('Daily help removed')),
     );
   }
 }

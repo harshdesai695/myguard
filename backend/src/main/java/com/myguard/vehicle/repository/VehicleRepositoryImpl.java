@@ -1,5 +1,12 @@
 package com.myguard.vehicle.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Repository;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -11,14 +18,9 @@ import com.myguard.vehicle.constants.VehicleConstants;
 import com.myguard.vehicle.view.ParkingSlotEntity;
 import com.myguard.vehicle.view.VehicleEntity;
 import com.myguard.vehicle.view.VisitorVehicleLogEntity;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -107,13 +109,17 @@ public class VehicleRepositoryImpl implements VehicleRepository {
         try {
             Query query = getVehiclesCollection()
                     .whereEqualTo(VehicleConstants.FIELD_OWNER_UID, ownerUid)
-                    .orderBy(VehicleConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING)
                     .offset(page * size)
                     .limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<VehicleEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(VehicleEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list vehicles", e);
@@ -179,16 +185,20 @@ public class VehicleRepositoryImpl implements VehicleRepository {
     @Override
     public List<ParkingSlotEntity> findParkingSlots(String societyId, int page, int size) {
         try {
-            Query query = getParkingCollection()
-                    .orderBy(VehicleConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getParkingCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(VehicleConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<ParkingSlotEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(ParkingSlotEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list parking slots", e);
@@ -239,16 +249,20 @@ public class VehicleRepositoryImpl implements VehicleRepository {
     @Override
     public List<VisitorVehicleLogEntity> findVisitorVehicleLogs(String societyId, int page, int size) {
         try {
-            Query query = getVisitorVehicleLogCollection()
-                    .orderBy(VehicleConstants.FIELD_CREATED_AT, Query.Direction.DESCENDING);
+            Query query = getVisitorVehicleLogCollection();
             if (societyId != null) {
                 query = query.whereEqualTo(VehicleConstants.FIELD_SOCIETY_ID, societyId);
             }
             query = query.offset(page * size).limit(size);
             QuerySnapshot snapshot = query.get().get();
-            return snapshot.getDocuments().stream()
+            List<VisitorVehicleLogEntity> result = snapshot.getDocuments().stream()
                     .map(doc -> doc.toObject(VisitorVehicleLogEntity.class))
                     .collect(Collectors.toList());
+            result.sort((a, b) -> {
+                if (a.getCreatedAt() == null || b.getCreatedAt() == null) return 0;
+                return String.valueOf(b.getCreatedAt()).compareTo(String.valueOf(a.getCreatedAt()));
+            });
+            return result;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new FirebaseOperationException("Failed to list visitor vehicle logs", e);

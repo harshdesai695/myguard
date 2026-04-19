@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -28,10 +27,10 @@ public class TicketEntity {
     private String status;
     private String priority;
     private String assignedTo;
-    private Instant slaDeadline;
+    private Object slaDeadline;
     private Integer rating;
     private String ratingComment;
     private String societyId;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private Object createdAt;
+    private Object updatedAt;
 }

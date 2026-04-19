@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.List;
 
 /**
@@ -21,5 +20,5 @@ public class PollVoteEntity {
     private String pollId;
     private String voterUid;
     private List<String> selectedOptions;
-    private Instant votedAt;
+    private Object votedAt;
 }
